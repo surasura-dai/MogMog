@@ -1,0 +1,4163 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>MogMog</title>
+
+    <!-- iPhone ホーム画面追加（PWA風）メタタグ -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="MogMog">
+    <meta name="theme-color" content="#faf7f2">
+
+    <!-- アプリアイコン & ファビコン（SVGデータURI） -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23F48B57'/%3E%3Cstop offset='100%25' stop-color='%23E86A33'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='42' fill='url(%23g)'/%3E%3Cpath d='M52 104h76c0 22-17 36-38 36s-38-14-38-36z' fill='%23FFFDF9'/%3E%3Crect x='46' y='95' width='88' height='10' rx='5' fill='%23FFFDF9'/%3E%3Cpath d='M68 82c0-10 8-12 8-22M90 80c0-10 8-12 8-24M112 82c0-10 8-12 8-22' stroke='%23FFFDF9' stroke-width='7' stroke-linecap='round' fill='none'/%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23F48B57'/%3E%3Cstop offset='100%25' stop-color='%23E86A33'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='180' height='180' fill='url(%23g)'/%3E%3Cpath d='M52 104h76c0 22-17 36-38 36s-38-14-38-36z' fill='%23FFFDF9'/%3E%3Crect x='46' y='95' width='88' height='10' rx='5' fill='%23FFFDF9'/%3E%3Cpath d='M68 82c0-10 8-12 8-22M90 80c0-10 8-12 8-24M112 82c0-10 8-12 8-22' stroke='%23FFFDF9' stroke-width='7' stroke-linecap='round' fill='none'/%3E%3C/svg%3E">
+
+    <style>
+        /* ==================== デザイン変数（和モダン・キッチン風） ==================== */
+        :root {
+            --bg-page: #FAF7F2;
+            --bg-surface: #FFFFFF;
+            --bg-subtle: #FDF5EE;
+            --bg-muted: #F1ECE5;
+            --border-soft: #E7E0D7;
+            --border-dotted: #DDD6CC;
+            --group-line: #CFC8BE;
+
+            --text-primary: #2B2522;
+            --text-secondary: #655C55;
+            --text-muted: #968C84;
+
+            --accent: #E86A33;
+            --accent-hover: #D05621;
+            --accent-light: #FFF0E8;
+            --accent-border: #F5BCA0;
+
+            /* カテゴリカラー */
+            --cat-main-bg: #FFF1E8;
+            --cat-main-text: #C84F1B;
+            --cat-main-border: #F7C9B2;
+
+            --cat-side-bg: #EDF9F0;
+            --cat-side-text: #1E7A44;
+            --cat-side-border: #BCE6C9;
+
+            --cat-soup-bg: #EEF5FF;
+            --cat-soup-text: #2259B8;
+            --cat-soup-border: #C2D9FA;
+
+            /* 自分用カラー */
+            --self-bg: #FEF5DC;
+            --self-text: #A86408;
+            --self-border: #F3D98B;
+
+            --danger: #D93838;
+            --danger-hover: #B92B2B;
+            --danger-bg: #FEF2F2;
+            --danger-border: #FBCACA;
+
+            --radius-sm: 10px;
+            --radius-md: 14px;
+            --radius-lg: 18px;
+            --radius-xl: 22px;
+            --shadow-sm: 0 1px 3px rgba(43, 37, 34, 0.06);
+            --shadow-md: 0 6px 18px rgba(43, 37, 34, 0.08);
+            --shadow-lg: 0 18px 40px rgba(43, 37, 34, 0.18);
+        }
+
+        /* ==================== リセット＆基本設定 ==================== */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        html {
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+            background-color: var(--bg-page);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.55;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            padding-left: env(safe-area-inset-left, 0px);
+            padding-right: env(safe-area-inset-right, 0px);
+        }
+
+        body.no-scroll {
+            overflow: hidden;
+        }
+
+        body.is-dragging {
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+
+        button, input, select, textarea {
+            font-family: inherit;
+            font-size: inherit;
+            color: inherit;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            background: none;
+            padding: 0;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ==================== ヘッダー（ノッチ対応） ==================== */
+        .app-header {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-soft);
+            box-shadow: var(--shadow-sm);
+            padding-top: env(safe-area-inset-top, 0px);
+        }
+
+        .header-inner {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 0 16px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .brand-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-align: left;
+            padding: 4px 0;
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 11px;
+            background: linear-gradient(135deg, #F48B57, var(--accent));
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(232, 106, 51, 0.28);
+            flex-shrink: 0;
+        }
+
+        .brand-title {
+            margin: 0;
+            font-size: 1.18rem;
+            font-weight: 800;
+            letter-spacing: 0.01em;
+            color: var(--text-primary);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .icon-btn-subtle {
+            width: 38px;
+            height: 38px;
+            border-radius: 11px;
+            background: var(--bg-page);
+            border: 1px solid var(--border-soft);
+            color: var(--text-secondary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+            flex-shrink: 0;
+        }
+
+        .icon-btn-subtle:hover {
+            background: var(--accent-light);
+            border-color: var(--accent-border);
+            color: var(--accent);
+        }
+
+        /* ==================== ボタン共通 ==================== */
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: var(--accent);
+            color: #FFFFFF;
+            font-weight: 700;
+            font-size: 0.88rem;
+            padding: 10px 15px;
+            border-radius: var(--radius-md);
+            box-shadow: 0 2px 6px rgba(232, 106, 51, 0.24);
+            transition: background 0.15s ease, transform 0.1s ease;
+            white-space: nowrap;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: var(--bg-surface);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-soft);
+            font-weight: 600;
+            font-size: 0.86rem;
+            padding: 9px 14px;
+            border-radius: var(--radius-md);
+            transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-subtle);
+            border-color: var(--accent-border);
+            color: var(--accent);
+        }
+
+        .btn-soft {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            background: var(--accent-light);
+            color: var(--accent-hover);
+            border: 1px solid var(--accent-border);
+            font-weight: 600;
+            font-size: 0.86rem;
+            padding: 9px 13px;
+            border-radius: var(--radius-md);
+            white-space: nowrap;
+        }
+
+        .btn-soft:hover {
+            background: #FFE2D2;
+        }
+
+        .btn-danger-outline {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            background: var(--bg-surface);
+            color: var(--danger);
+            border: 1px solid var(--danger-border);
+            font-weight: 600;
+            font-size: 0.86rem;
+            padding: 9px 13px;
+            border-radius: var(--radius-md);
+            white-space: nowrap;
+        }
+
+        .btn-danger-outline:hover {
+            background: var(--danger-bg);
+        }
+
+        .btn-danger {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: var(--danger);
+            color: #FFFFFF;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 10px 18px;
+            border-radius: var(--radius-md);
+        }
+
+        .btn-danger:hover {
+            background: var(--danger-hover);
+        }
+
+        /* ==================== メインレイアウト ==================== */
+        .app-main {
+            flex: 1;
+            width: 100%;
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 18px 14px 44px;
+        }
+
+        .app-footer {
+            text-align: center;
+            padding: 12px 16px calc(24px + env(safe-area-inset-bottom, 0px));
+            font-size: 0.76rem;
+            color: var(--text-muted);
+        }
+
+        /* 右下の控えめなバージョン表示（操作の邪魔にならない固定配置） */
+        .app-version-badge {
+            position: fixed;
+            right: calc(12px + env(safe-area-inset-right, 0px));
+            bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+            z-index: 25;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-select: none;
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            color: var(--text-muted);
+            background: rgba(250, 247, 242, 0.78);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(231, 224, 215, 0.7);
+            padding: 2px 7px;
+            border-radius: 999px;
+            opacity: 0.75;
+        }
+
+        /* ==================== カテゴリタブ ==================== */
+        .category-tabs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            background: var(--bg-surface);
+            padding: 6px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-soft);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 12px;
+        }
+
+        .cat-tab {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            padding: 10px 4px;
+            border-radius: 12px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            transition: background 0.15s ease, color 0.15s ease;
+            min-width: 0;
+        }
+
+        .cat-tab:hover {
+            background: var(--bg-subtle);
+            color: var(--text-primary);
+        }
+
+        .cat-tab.active {
+            background: var(--accent);
+            color: #FFFFFF;
+            box-shadow: 0 2px 6px rgba(232, 106, 51, 0.25);
+        }
+
+        .cat-tab-count {
+            font-size: 0.73rem;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 999px;
+            background: var(--bg-muted);
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .cat-tab.active .cat-tab-count {
+            background: rgba(255, 255, 255, 0.25);
+            color: #FFFFFF;
+        }
+
+        /* ==================== ツールバー＆ヒント ==================== */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-soft);
+            border-radius: 15px;
+            padding: 11px 14px;
+            margin-bottom: 10px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .count-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.86rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .count-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        .count-num {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .sort-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sort-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .sort-select {
+            background: var(--bg-page);
+            border: 1px solid var(--border-soft);
+            border-radius: 10px;
+            padding: 7px 10px;
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            outline: none;
+        }
+
+        .sort-select:focus {
+            border-color: var(--accent);
+        }
+
+        .sort-hint {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.77rem;
+            color: var(--text-secondary);
+            background: var(--bg-subtle);
+            border: 1px solid var(--accent-border);
+            border-radius: 12px;
+            padding: 8px 12px;
+            margin-bottom: 12px;
+        }
+
+        /* ==================== レシピカード一覧 ==================== */
+        .recipe-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: relative;
+        }
+
+        .recipe-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .recipe-card:hover {
+            border-color: var(--accent-border);
+            box-shadow: var(--shadow-md);
+        }
+
+        .drag-handle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 18px 8px 18px 14px;
+            color: #C4BCB3;
+            cursor: grab;
+            touch-action: none;
+            flex-shrink: 0;
+        }
+
+        .drag-handle:hover, .drag-handle:active {
+            color: var(--accent);
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .card-body {
+            flex: 1;
+            min-width: 0;
+            padding: 15px 10px 15px 6px;
+            cursor: pointer;
+        }
+
+        .recipe-card.no-handle .card-body {
+            padding-left: 16px;
+        }
+
+        .card-top-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .card-title {
+            margin: 0;
+            font-size: 1.03rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .card-chevron {
+            padding: 0 14px 0 4px;
+            color: #CDC5BC;
+            flex-shrink: 0;
+            pointer-events: none;
+        }
+
+        /* バッジ */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 999px;
+            line-height: 1.45;
+            white-space: nowrap;
+        }
+
+        .badge-main {
+            background: var(--cat-main-bg);
+            color: var(--cat-main-text);
+            border: 1px solid var(--cat-main-border);
+        }
+
+        .badge-side {
+            background: var(--cat-side-bg);
+            color: var(--cat-side-text);
+            border: 1px solid var(--cat-side-border);
+        }
+
+        .badge-soup {
+            background: var(--cat-soup-bg);
+            color: var(--cat-soup-text);
+            border: 1px solid var(--cat-soup-border);
+        }
+
+        .badge-info {
+            background: var(--bg-muted);
+            color: var(--text-secondary);
+        }
+
+        .badge-self {
+            background: var(--self-bg);
+            color: var(--self-text);
+            border: 1px solid var(--self-border);
+        }
+
+        /* ドラッグ中（一覧カード & 編集グループ共通） */
+        .drag-placeholder {
+            border: 2px dashed var(--accent);
+            background: rgba(255, 240, 232, 0.72);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            transition: height 0.12s ease;
+        }
+
+        .drag-ghost {
+            position: fixed;
+            z-index: 120;
+            pointer-events: none;
+            box-shadow: var(--shadow-lg);
+            border: 2px solid var(--accent) !important;
+            background: #FFFDFB !important;
+            transform: scale(1.015);
+            opacity: 0.96;
+            border-radius: var(--radius-lg);
+        }
+
+        /* 空状態 */
+        .empty-state {
+            text-align: center;
+            background: var(--bg-surface);
+            border: 1.5px dashed var(--border-soft);
+            border-radius: var(--radius-xl);
+            padding: 44px 20px;
+        }
+
+        .empty-icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 14px;
+            border-radius: 16px;
+            background: var(--accent-light);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .empty-title {
+            margin: 0 0 6px;
+            font-size: 1.04rem;
+            font-weight: 700;
+        }
+
+        .empty-desc {
+            margin: 0 0 20px;
+            font-size: 0.86rem;
+            color: var(--text-secondary);
+        }
+
+        /* ==================== 詳細画面 ==================== */
+        .detail-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .detail-nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        .detail-hero {
+            background: linear-gradient(135deg, #FDF5EE 0%, #FFFFFF 100%);
+            padding: 20px 22px;
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        .detail-hero-badges {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .detail-title {
+            margin: 0;
+            font-size: 1.48rem;
+            font-weight: 700;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+
+        .detail-body {
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--bg-muted);
+            margin-bottom: 14px;
+        }
+
+        .section-title-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
+            background: var(--accent-light);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            margin: 0;
+            font-size: 1.08rem;
+            font-weight: 700;
+        }
+
+        /* 分量切り替えタブ（自分用 / 1〜5人前） */
+        .serving-selector {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 5px;
+            background: var(--bg-muted);
+            padding: 5px;
+            border-radius: 13px;
+            margin-bottom: 12px;
+        }
+
+        .serving-pill {
+            padding: 8px 4px;
+            border-radius: 9px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-align: center;
+            transition: background 0.15s ease, color 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .serving-pill.active {
+            background: var(--bg-surface);
+            color: var(--accent);
+            box-shadow: 0 1px 4px rgba(43, 37, 34, 0.08);
+        }
+
+        .serving-pill.is-self.active {
+            background: var(--self-bg);
+            color: var(--self-text);
+        }
+
+        .pill-dot {
+            display: inline-block;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--accent);
+            vertical-align: top;
+            margin-left: 2px;
+            margin-top: 2px;
+        }
+
+        .serving-pill.is-self .pill-dot {
+            background: var(--self-text);
+        }
+
+        .ingredients-helper-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 12px;
+            min-height: 24px;
+        }
+
+        .helper-text {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .btn-reset-check {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--accent);
+            background: var(--accent-light);
+            padding: 5px 11px;
+            border-radius: 999px;
+        }
+
+        .btn-reset-check:hover {
+            background: #FFE0CE;
+        }
+
+        /* ==================== クラシル風 材料グループ表示 ==================== */
+        .detail-groups-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .detail-group-block {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-group-title {
+            margin: 0 0 8px 0;
+            font-size: 0.94rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 0.01em;
+        }
+
+        .ingredient-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 左縦ラインでまとめる（クラシル風） */
+        .ingredient-list.with-left-line {
+            border-left: 4px solid var(--group-line);
+            padding-left: 14px;
+            margin-left: 2px;
+        }
+
+        .ingredient-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 11px 6px;
+            border-bottom: 1.5px dotted var(--border-dotted);
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: background 0.12s ease;
+        }
+
+        .ingredient-item:last-child {
+            border-bottom: none;
+        }
+
+        .ingredient-item:hover {
+            background: #FAF9F7;
+            border-radius: 8px;
+        }
+
+        .ing-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .ing-check {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 1.8px solid #CFC8BF;
+            background: var(--bg-surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.15s ease;
+        }
+
+        .ingredient-item.checked .ing-check {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #FFFFFF;
+        }
+
+        .ing-name {
+            font-size: 0.96rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            word-break: break-word;
+        }
+
+        .ingredient-item.checked .ing-name {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .ing-amount {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-align: right;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .ing-amount.is-scaled {
+            color: var(--accent);
+        }
+
+        .ing-amount.is-self-custom {
+            color: var(--self-text);
+        }
+
+        .ingredient-item.checked .ing-amount {
+            text-decoration: line-through;
+            color: #C7BEB5;
+        }
+
+        /* 作り方リスト */
+        .step-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: var(--bg-page);
+            border: 1px solid var(--border-soft);
+            border-radius: 15px;
+            padding: 13px 15px;
+        }
+
+        .step-num {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #FFFFFF;
+            font-size: 0.82rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .step-text {
+            margin: 0;
+            font-size: 0.95rem;
+            line-height: 1.65;
+            word-break: break-word;
+            flex: 1;
+        }
+
+        /* メモカード */
+        .memo-card {
+            background: #FFFBF4;
+            border: 1px solid #F3E2C6;
+            border-radius: 15px;
+            padding: 14px 16px;
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1.65;
+        }
+
+        /* ==================== モーダル共通 ==================== */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 60;
+            background: rgba(34, 29, 25, 0.54);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            padding-top: max(10px, env(safe-area-inset-top, 10px));
+            padding-bottom: max(10px, env(safe-area-inset-bottom, 10px));
+        }
+
+        .modal-backdrop.confirm-layer {
+            z-index: 85;
+        }
+
+        .modal-panel {
+            background: var(--bg-surface);
+            width: 100%;
+            max-width: 680px;
+            max-height: 90dvh;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-soft);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .modal-panel-md {
+            max-width: 500px;
+        }
+
+        .modal-panel-sm {
+            max-width: 390px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .modal-header {
+            padding: 15px 18px;
+            background: var(--bg-page);
+            border-bottom: 1px solid var(--border-soft);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .modal-title {
+            margin: 0;
+            font-size: 1.06rem;
+            font-weight: 700;
+        }
+
+        .modal-close-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close-btn:hover {
+            background: var(--accent-light);
+            color: var(--text-primary);
+        }
+
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .modal-body {
+            padding: 18px;
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .modal-footer {
+            padding: 13px 18px;
+            background: var(--bg-page);
+            border-top: 1px solid var(--border-soft);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        /* フォーム要素 */
+        .form-error {
+            background: var(--danger-bg);
+            border: 1px solid var(--danger-border);
+            color: var(--danger);
+            font-size: 0.84rem;
+            font-weight: 600;
+            padding: 10px 13px;
+            border-radius: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 0.88rem;
+            font-weight: 700;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .label-req {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--accent);
+            background: var(--accent-light);
+            padding: 1px 7px;
+            border-radius: 999px;
+        }
+
+        .label-sub {
+            font-size: 0.74rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .text-input, .textarea-input {
+            width: 100%;
+            background: #FAF9F7;
+            border: 1px solid var(--border-soft);
+            border-radius: 11px;
+            padding: 9px 12px;
+            font-size: 0.92rem;
+            color: var(--text-primary);
+            outline: none;
+            transition: background 0.15s ease, border-color 0.15s ease;
+        }
+
+        .text-input:focus, .textarea-input:focus {
+            background: var(--bg-surface);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(232, 106, 51, 0.14);
+        }
+
+        .textarea-input {
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        /* カテゴリ選択 */
+        .category-picker {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .cat-pick-btn {
+            padding: 10px 8px;
+            border-radius: 12px;
+            border: 1.5px solid var(--border-soft);
+            background: var(--bg-surface);
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .cat-pick-btn.active[data-cat="main"] {
+            background: var(--cat-main-bg);
+            color: var(--cat-main-text);
+            border-color: var(--accent);
+        }
+
+        .cat-pick-btn.active[data-cat="side"] {
+            background: var(--cat-side-bg);
+            color: var(--cat-side-text);
+            border-color: #1E7A44;
+        }
+
+        .cat-pick-btn.active[data-cat="soup"] {
+            background: var(--cat-soup-bg);
+            color: var(--cat-soup-text);
+            border-color: #2259B8;
+        }
+
+        /* 編集用人数タブ（左から 自分用 / 1人前(基準) / 2〜5人前） */
+        .editor-serving-tabs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            background: var(--bg-muted);
+            padding: 5px;
+            border-radius: 13px;
+        }
+
+        .editor-tab-btn {
+            padding: 8px 4px;
+            border-radius: 9px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .editor-tab-btn.active {
+            background: var(--bg-surface);
+            color: var(--accent);
+            box-shadow: 0 1px 4px rgba(43, 37, 34, 0.08);
+        }
+
+        .editor-tab-btn[data-serving="self"].active {
+            background: var(--self-bg);
+            color: var(--self-text);
+        }
+
+        .tab-custom-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .editor-tab-btn[data-serving="self"] .tab-custom-dot {
+            background: var(--self-text);
+        }
+
+        .editor-serving-hint {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--accent-border);
+            border-radius: 12px;
+            padding: 9px 12px;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+
+        .btn-reset-serving {
+            font-size: 0.74rem;
+            font-weight: 700;
+            color: var(--danger);
+            background: var(--bg-surface);
+            border: 1px solid var(--danger-border);
+            padding: 5px 10px;
+            border-radius: 8px;
+            white-space: nowrap;
+        }
+
+        .btn-reset-serving:hover {
+            background: var(--danger-bg);
+        }
+
+        /* ==================== グループ編集カード（D&D並び替え＆削除対応） ==================== */
+        .editor-groups-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+        }
+
+        .editor-empty-groups {
+            text-align: center;
+            padding: 20px 14px;
+            background: #FAF9F6;
+            border: 1.5px dashed var(--border-soft);
+            border-radius: 14px;
+            font-size: 0.84rem;
+            color: var(--text-secondary);
+        }
+
+        .editor-group-card {
+            background: #FAF9F6;
+            border: 1px solid var(--border-soft);
+            border-radius: 15px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .editor-group-card.has-line {
+            border-left: 4px solid var(--group-line);
+        }
+
+        .editor-group-header {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .group-drag-handle {
+            width: 34px;
+            height: 36px;
+            border-radius: 9px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-soft);
+            color: #A59D94;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            touch-action: none;
+            flex-shrink: 0;
+            transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+        }
+
+        .group-drag-handle:hover, .group-drag-handle:active {
+            color: var(--accent);
+            border-color: var(--accent-border);
+            background: var(--accent-light);
+        }
+
+        .group-drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .group-title-input {
+            flex: 1;
+            min-width: 90px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-soft);
+            border-radius: 9px;
+            padding: 7px 10px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            outline: none;
+        }
+
+        .group-title-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(232, 106, 51, 0.14);
+        }
+
+        .group-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .btn-line-toggle {
+            font-size: 0.74rem;
+            font-weight: 700;
+            padding: 7px 9px;
+            border-radius: 9px;
+            border: 1px solid var(--border-soft);
+            background: var(--bg-surface);
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        .btn-line-toggle.active {
+            background: #EFECE6;
+            border-color: #B6AFA5;
+            color: var(--text-primary);
+        }
+
+        .btn-group-delete {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 7px 10px;
+            border-radius: 9px;
+            border: 1px solid var(--danger-border);
+            background: var(--bg-surface);
+            color: var(--danger);
+            font-size: 0.75rem;
+            font-weight: 700;
+            white-space: nowrap;
+            transition: background 0.15s ease;
+        }
+
+        .btn-group-delete:hover {
+            background: var(--danger-bg);
+        }
+
+        .ing-base-row {
+            display: grid;
+            grid-template-columns: 1fr 112px 34px;
+            gap: 7px;
+            align-items: center;
+        }
+
+        .ing-base-row .text-input {
+            background: var(--bg-surface);
+            padding: 8px 10px;
+            font-size: 0.88rem;
+        }
+
+        .btn-remove-row {
+            width: 34px;
+            height: 36px;
+            border-radius: 9px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-remove-row:hover {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+
+        .btn-add-item-in-group {
+            align-self: flex-start;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--accent);
+            background: var(--bg-surface);
+            border: 1px dashed var(--accent-border);
+            padding: 7px 12px;
+            border-radius: 9px;
+        }
+
+        .btn-add-item-in-group:hover {
+            background: var(--accent-light);
+        }
+
+        /* ワンタップ グループ追加プリセット */
+        .preset-box {
+            background: var(--bg-page);
+            border: 1px solid var(--border-soft);
+            border-radius: 13px;
+            padding: 12px;
+        }
+
+        .preset-label {
+            font-size: 0.76rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin: 0 0 8px 0;
+        }
+
+        .preset-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .preset-chip {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--accent-hover);
+            background: var(--bg-surface);
+            border: 1px solid var(--accent-border);
+            padding: 7px 11px;
+            border-radius: 999px;
+            transition: background 0.12s ease;
+        }
+
+        .preset-chip:hover {
+            background: var(--accent-light);
+        }
+
+        .preset-chip.is-free {
+            background: var(--accent-light);
+            border-style: dashed;
+        }
+
+        /* カスタム分量入力行（自分用 / 2〜5人前タブ） */
+        .custom-group-block {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .custom-group-heading {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin: 4px 0 0 2px;
+        }
+
+        .ing-custom-row {
+            display: grid;
+            grid-template-columns: 1fr 142px;
+            gap: 10px;
+            align-items: center;
+            background: #FAF9F6;
+            border: 1px solid var(--border-soft);
+            border-radius: 11px;
+            padding: 8px 10px 8px 12px;
+        }
+
+        .ing-custom-name {
+            font-size: 0.88rem;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .ing-custom-sub {
+            display: block;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .ing-custom-input {
+            width: 100%;
+            background: var(--bg-surface);
+            border: 1px solid var(--accent-border);
+            border-radius: 9px;
+            padding: 7px 9px;
+            font-size: 0.86rem;
+            outline: none;
+        }
+
+        .ing-custom-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(232, 106, 51, 0.14);
+        }
+
+        /* ==================== データ管理モーダル ==================== */
+        .backup-card {
+            background: var(--bg-page);
+            border: 1px solid var(--border-soft);
+            border-radius: 15px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .backup-card-title {
+            margin: 0;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .backup-card-desc {
+            margin: 0;
+            font-size: 0.79rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        .backup-btn-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .backup-btn-row > button {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .backup-version-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            padding: 2px 4px;
+        }
+
+        /* 確認モーダル */
+        .delete-icon-box {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 12px;
+            border-radius: 15px;
+            background: var(--danger-bg);
+            color: var(--danger);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-desc {
+            margin: 6px 0 20px;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            word-break: break-word;
+            line-height: 1.55;
+        }
+
+        .delete-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .delete-actions > button {
+            flex: 1;
+        }
+
+        /* ==================== トースト通知 ==================== */
+        .toast {
+            position: fixed;
+            bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+            left: 50%;
+            transform: translate(-50%, 16px);
+            z-index: 110;
+            background: #2B2522;
+            color: #FFFFFF;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 10px 18px;
+            border-radius: 14px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            white-space: nowrap;
+            max-width: calc(100vw - 32px);
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+
+        .toast-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            flex-shrink: 0;
+        }
+
+        /* ==================== レスポンシブ ==================== */
+        @media (min-width: 560px) {
+            .editor-serving-tabs {
+                grid-template-columns: repeat(6, 1fr);
+            }
+        }
+
+        @media (max-width: 520px) {
+            .header-inner {
+                padding: 0 12px;
+            }
+            .app-main {
+                padding: 14px 12px 38px;
+            }
+            .category-tabs {
+                gap: 4px;
+                padding: 5px;
+            }
+            .cat-tab {
+                flex-direction: column;
+                gap: 2px;
+                padding: 8px 2px;
+                font-size: 0.82rem;
+            }
+            .serving-selector {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .detail-hero {
+                padding: 18px 16px;
+            }
+            .detail-body {
+                padding: 18px 16px;
+            }
+            .detail-title {
+                font-size: 1.3rem;
+            }
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .sort-wrap {
+                justify-content: space-between;
+            }
+            .sort-select {
+                flex: 1;
+            }
+            .editor-group-header {
+                flex-wrap: wrap;
+            }
+            .group-header-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            .ing-base-row {
+                grid-template-columns: 1fr 94px 32px;
+                gap: 5px;
+            }
+            .ing-custom-row {
+                grid-template-columns: 1fr 118px;
+                gap: 8px;
+            }
+            .modal-body {
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== ヘッダー ==================== -->
+    <header class="app-header">
+        <div class="header-inner">
+            <button id="headerLogoBtn" type="button" class="brand-btn" aria-label="一覧に戻る">
+                <div class="brand-icon">
+                    <!-- MogMog お椀＆湯気アイコン -->
+                    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 13h16a7 7 0 01-7 7h-2a7 7 0 01-7-7z"/>
+                        <path d="M3 13h18"/>
+                        <path d="M8 9c0-1.5 1-2 1-3.5M12 8.5c0-1.5 1-2 1-3.5M16 9c0-1.5 1-2 1-3.5"/>
+                    </svg>
+                </div>
+                <h1 class="brand-title">MogMog</h1>
+            </button>
+
+            <div class="header-actions">
+                <button id="openBackupModalBtn" type="button" class="icon-btn-subtle" aria-label="データ管理（バックアップ・復元）" title="データ管理（書き出し・読み込み）">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 3v12m0 0l-4-4m4 4l4-4"/>
+                        <path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/>
+                    </svg>
+                </button>
+
+                <button id="openAddModalBtn" type="button" class="btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round">
+                        <path d="M12 4v16m8-8H4"/>
+                    </svg>
+                    <span>レシピを追加</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==================== メインコンテンツ ==================== -->
+    <main class="app-main">
+
+        <!-- 1. レシピ一覧画面 -->
+        <section id="listView">
+            <div id="categoryTabs" class="category-tabs" role="tablist" aria-label="カテゴリ絞り込み">
+                <button type="button" class="cat-tab active" data-category="all" role="tab" aria-selected="true">
+                    <span>すべて</span>
+                    <span class="cat-tab-count" id="countAll">0</span>
+                </button>
+                <button type="button" class="cat-tab" data-category="main" role="tab" aria-selected="false">
+                    <span>主菜</span>
+                    <span class="cat-tab-count" id="countMain">0</span>
+                </button>
+                <button type="button" class="cat-tab" data-category="side" role="tab" aria-selected="false">
+                    <span>副菜</span>
+                    <span class="cat-tab-count" id="countSide">0</span>
+                </button>
+                <button type="button" class="cat-tab" data-category="soup" role="tab" aria-selected="false">
+                    <span>汁物</span>
+                    <span class="cat-tab-count" id="countSoup">0</span>
+                </button>
+            </div>
+
+            <div class="toolbar">
+                <div class="count-display">
+                    <span class="count-dot"></span>
+                    <span>表示中：<strong id="recipeCount" class="count-num">0</strong> 品</span>
+                </div>
+
+                <div class="sort-wrap">
+                    <label for="sortSelect" class="sort-label">並び替え:</label>
+                    <select id="sortSelect" class="sort-select">
+                        <option value="manual">手動順（ドラッグで並び替え）</option>
+                        <option value="newest">新しい順</option>
+                        <option value="oldest">古い順</option>
+                        <option value="name">名前順（あいうえお順）</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="manualSortHint" class="sort-hint hidden">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E86A33" stroke-width="2.2" stroke-linecap="round">
+                    <path d="M4 8h16M4 16h16"/>
+                </svg>
+                <span>カードを<strong>長押し</strong>（または左の <strong>≡</strong> を掴んで上下ドラッグ）で並び替えできます</span>
+            </div>
+
+            <div id="recipeListContainer" class="recipe-list"></div>
+
+            <div id="emptyState" class="empty-state hidden">
+                <div class="empty-icon">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                    </svg>
+                </div>
+                <h2 id="emptyStateTitle" class="empty-title">まだレシピがありません</h2>
+                <p id="emptyStateDesc" class="empty-desc">お気に入りの料理を登録して、自分だけのレシピ帳を作りましょう。</p>
+                <button id="emptyAddBtn" type="button" class="btn-primary">＋ レシピを追加する</button>
+            </div>
+        </section>
+
+        <!-- 2. レシピ詳細画面 -->
+        <section id="detailView" class="hidden">
+            <div class="detail-nav">
+                <button id="backToListBtn" type="button" class="btn-secondary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    <span>一覧に戻る</span>
+                </button>
+
+                <div class="detail-nav-actions">
+                    <button id="editRecipeBtn" type="button" class="btn-soft">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        <span>編集</span>
+                    </button>
+                    <button id="deleteRecipeBtn" type="button" class="btn-danger-outline">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                        <span>削除</span>
+                    </button>
+                </div>
+            </div>
+
+            <article class="detail-card">
+                <div class="detail-hero">
+                    <div class="detail-hero-badges">
+                        <span id="detailCategoryBadge" class="badge badge-main">主菜</span>
+                    </div>
+                    <h2 id="detailTitle" class="detail-title"></h2>
+                </div>
+
+                <div class="detail-body">
+                    <!-- 材料セクション -->
+                    <div>
+                        <div class="section-header">
+                            <div class="section-title-group">
+                                <span class="section-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                    </svg>
+                                </span>
+                                <h3 class="section-title">材料</h3>
+                                <span id="detailCustomBadge" class="badge badge-self hidden">カスタム</span>
+                            </div>
+                        </div>
+
+                        <div id="detailServingSelector" class="serving-selector" role="tablist" aria-label="人数の切り替え"></div>
+
+                        <div class="ingredients-helper-row">
+                            <p id="detailServingNote" class="helper-text">材料をタップすると準備済みチェックができます</p>
+                            <button id="resetCheckBtn" type="button" class="btn-reset-check hidden">チェックをリセット</button>
+                        </div>
+
+                        <div id="detailIngredientGroups" class="detail-groups-wrap"></div>
+                    </div>
+
+                    <!-- 作り方セクション -->
+                    <div>
+                        <div class="section-header">
+                            <div class="section-title-group">
+                                <span class="section-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </span>
+                                <h3 class="section-title">作り方</h3>
+                            </div>
+                        </div>
+                        <ol id="detailSteps" class="step-list"></ol>
+                    </div>
+
+                    <!-- メモセクション（入力がある場合のみ表示） -->
+                    <div id="detailMemoSection" class="hidden">
+                        <div class="section-header">
+                            <div class="section-title-group">
+                                <span class="section-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                                        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                    </svg>
+                                </span>
+                                <h3 class="section-title">メモ</h3>
+                            </div>
+                        </div>
+                        <div id="detailMemoText" class="memo-card"></div>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+    </main>
+
+    <footer class="app-footer">
+        <p>データは端末のブラウザ内に自動保存されます</p>
+    </footer>
+
+    <!-- 右下の控えめなバージョン表示 -->
+    <div id="appVersionBadge" class="app-version-badge" aria-hidden="true"></div>
+
+    <!-- ==================== 追加・編集モーダル ==================== -->
+    <div id="recipeModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-panel">
+            <div class="modal-header">
+                <h2 id="modalTitle" class="modal-title">新しいレシピを追加</h2>
+                <button id="closeModalBtn" type="button" class="modal-close-btn" aria-label="閉じる">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                        <path d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <form id="recipeForm" class="modal-form">
+                <div id="recipeModalBody" class="modal-body">
+                    <div id="formError" class="form-error hidden"></div>
+
+                    <!-- レシピ名 -->
+                    <div class="form-group">
+                        <label for="inputTitle" class="form-label">
+                            <span>メニュー名</span>
+                            <span class="label-req">必須</span>
+                        </label>
+                        <input id="inputTitle" type="text" maxlength="100" class="text-input" placeholder="例：豚の生姜焼き">
+                    </div>
+
+                    <!-- カテゴリ -->
+                    <div class="form-group">
+                        <span class="form-label">カテゴリ</span>
+                        <div id="categoryPicker" class="category-picker" role="radiogroup" aria-label="カテゴリ">
+                            <button type="button" class="cat-pick-btn active" data-cat="main">主菜</button>
+                            <button type="button" class="cat-pick-btn" data-cat="side">副菜</button>
+                            <button type="button" class="cat-pick-btn" data-cat="soup">汁物</button>
+                        </div>
+                    </div>
+
+                    <!-- 材料（グループ分け・並び替え・削除・人数別タブ） -->
+                    <div class="form-group">
+                        <span class="form-label">
+                            <span>材料と分量</span>
+                            <span class="label-sub">左の「≡」でグループをドラッグ並び替え・右上で削除できます</span>
+                        </span>
+
+                        <div id="editorServingTabs" class="editor-serving-tabs" role="tablist" aria-label="編集する人前"></div>
+
+                        <div class="editor-serving-hint">
+                            <span id="editorHintText"></span>
+                            <button id="resetServingCustomBtn" type="button" class="btn-reset-serving hidden">カスタムをリセット</button>
+                        </div>
+
+                        <div id="editorGroupsContainer" class="editor-groups-wrap"></div>
+
+                        <!-- グループ追加プリセット（1人前タブのみ表示） -->
+                        <div id="groupPresetBox" class="preset-box">
+                            <p class="preset-label">＋ グループ（区切り）をワンタップで追加</p>
+                            <div id="presetChipsContainer" class="preset-chips"></div>
+                        </div>
+                    </div>
+
+                    <!-- 作り方 -->
+                    <div class="form-group">
+                        <label for="inputSteps" class="form-label">
+                            <span>作り方</span>
+                            <span class="label-sub">1行につき1ステップ</span>
+                        </label>
+                        <textarea id="inputSteps" rows="5" class="textarea-input" placeholder="1行につき1つの手順を入力してください&#10;例：&#10;玉ねぎを薄切りにする。&#10;フライパンで肉と玉ねぎを炒める。"></textarea>
+                    </div>
+
+                    <!-- メモ -->
+                    <div class="form-group">
+                        <label for="inputMemo" class="form-label">
+                            <span>メモ</span>
+                            <span class="label-sub">任意（コツやアレンジなど）</span>
+                        </label>
+                        <textarea id="inputMemo" rows="2" class="textarea-input" placeholder="例：自分用のときはタレ多めにする"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button id="cancelModalBtn" type="button" class="btn-secondary">キャンセル</button>
+                    <button type="submit" class="btn-primary">保存する</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== データ管理（バックアップ・復元）モーダル ==================== -->
+    <div id="backupModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="backupModalTitle">
+        <div class="modal-panel modal-panel-md">
+            <div class="modal-header">
+                <h2 id="backupModalTitle" class="modal-title">データ管理（バックアップ）</h2>
+                <button id="closeBackupModalBtn" type="button" class="modal-close-btn" aria-label="閉じる">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                        <path d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div id="backupError" class="form-error hidden"></div>
+
+                <!-- 書き出しセクション -->
+                <div class="backup-card">
+                    <h3 class="backup-card-title">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#E86A33" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                        </svg>
+                        <span>レシピを書き出す（保存）</span>
+                    </h3>
+                    <p class="backup-card-desc">
+                        アプリのアップデートや機種変更の前に、登録したレシピをJSONファイルとして保存したり、テキストとしてコピーしておけます。
+                    </p>
+                    <div class="backup-btn-row">
+                        <button id="exportJsonFileBtn" type="button" class="btn-primary">JSONをダウンロード</button>
+                        <button id="copyJsonTextBtn" type="button" class="btn-soft">テキストをコピー</button>
+                    </div>
+                </div>
+
+                <!-- 読み込みセクション -->
+                <div class="backup-card">
+                    <h3 class="backup-card-title">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#E86A33" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                        </svg>
+                        <span>レシピを読み込む（復元）</span>
+                    </h3>
+                    <p class="backup-card-desc">
+                        バックアップしたJSONファイルを選択するか、コピーしたJSONテキストを貼り付けて復元できます。
+                    </p>
+                    <input id="importFileInput" type="file" accept=".json,application/json" class="hidden">
+                    <div class="backup-btn-row">
+                        <button id="triggerFileImportBtn" type="button" class="btn-secondary">JSONファイルを選択</button>
+                    </div>
+
+                    <textarea id="importJsonTextarea" rows="3" class="textarea-input" placeholder="ここにバックアップJSONを貼り付けて復元することもできます"></textarea>
+                    <div class="backup-btn-row">
+                        <button id="importTextBtn" type="button" class="btn-soft">貼り付けたテキストから復元</button>
+                    </div>
+                </div>
+
+                <div class="backup-version-row">
+                    <span>MogMog アプリバージョン</span>
+                    <strong id="backupVersionText"></strong>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="doneBackupModalBtn" type="button" class="btn-secondary">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 共通確認モーダル（削除・データ上書き復元） ==================== -->
+    <div id="confirmModal" class="modal-backdrop confirm-layer hidden" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+        <div class="modal-panel modal-panel-sm">
+            <div class="delete-icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                </svg>
+            </div>
+            <h3 id="confirmModalTitle" class="modal-title">確認</h3>
+            <p id="confirmModalDesc" class="delete-desc"></p>
+            <div class="delete-actions">
+                <button id="cancelConfirmBtn" type="button" class="btn-secondary">キャンセル</button>
+                <button id="okConfirmBtn" type="button" class="btn-danger">実行する</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== トースト通知 ==================== -->
+    <div id="toast" class="toast" role="status" aria-live="polite">
+        <span class="toast-dot"></span>
+        <span id="toastMessage">保存しました</span>
+    </div>
+
+    <!-- ==================== アプリケーションスクリプト ==================== -->
+    <script>
+        (function () {
+            'use strict';
+
+            // --------------------------------------------------
+            // アプリバージョン（今後のアップデート時にここを書き換え）
+            // --------------------------------------------------
+            const APP_VERSION = 'v1.0.0';
+
+            // --------------------------------------------------
+            // ストレージキー・定数・プリセット
+            // --------------------------------------------------
+            const STORAGE_KEY = 'mogmog_recipes_v1';
+            const LEGACY_STORAGE_KEY = 'my_recipe_book_v6';
+            const SORT_STORAGE_KEY = 'mogmog_sort_v1';
+
+            const CATEGORIES = {
+                main: { label: '主菜', badgeClass: 'badge-main' },
+                side: { label: '副菜', badgeClass: 'badge-side' },
+                soup: { label: '汁物', badgeClass: 'badge-soup' }
+            };
+
+            const DETAIL_SERVING_OPTIONS = [
+                { key: 'self', label: '自分用' },
+                { key: '1', label: '1人前' },
+                { key: '2', label: '2人前' },
+                { key: '3', label: '3人前' },
+                { key: '4', label: '4人前' },
+                { key: '5', label: '5人前' }
+            ];
+
+            const EDITOR_SERVING_OPTIONS = [
+                { key: 'self', label: '自分用' },
+                { key: '1', label: '1人前(基準)' },
+                { key: '2', label: '2人前' },
+                { key: '3', label: '3人前' },
+                { key: '4', label: '4人前' },
+                { key: '5', label: '5人前' }
+            ];
+
+            const GROUP_PRESETS = [
+                { label: '食材', title: '食材', showLine: false },
+                { label: '調味料', title: '調味料', showLine: true },
+                { label: '(A)', title: '(A)', showLine: true },
+                { label: '(B)', title: '(B)', showLine: true },
+                { label: 'ソース・タレ', title: 'ソース・タレ', showLine: true },
+                { label: '下味', title: '下味', showLine: true },
+                { label: '付け合わせ', title: '付け合わせ', showLine: true },
+                { label: 'トッピング', title: 'トッピング', showLine: false },
+                { label: '衣', title: '衣', showLine: true },
+                { label: '自由に追加', title: '', showLine: false, isFree: true }
+            ];
+
+            function createSampleRecipes() {
+                const now = Date.now();
+                return [
+                    {
+                        id: 'sample-ginger-pork',
+                        title: '豚の生姜焼き',
+                        category: 'main',
+                        memo: '自分用のときは豚肉と生姜を多めにしてガッツリ食べるのが定番。',
+                        groups: [
+                            {
+                                title: '食材',
+                                showLine: false,
+                                items: [
+                                    { name: '豚ロース薄切り肉', amount1: '120g', customAmounts: { self: '180g' } },
+                                    { name: '玉ねぎ', amount1: '1/4個', customAmounts: { self: '1/2個' } },
+                                    { name: 'サラダ油', amount1: '小さじ1', customAmounts: {} }
+                                ]
+                            },
+                            {
+                                title: '(A)',
+                                showLine: true,
+                                items: [
+                                    { name: 'しょうゆ', amount1: '大さじ1', customAmounts: { self: '大さじ1.5' } },
+                                    { name: 'みりん', amount1: '大さじ1', customAmounts: { self: '大さじ1.5' } },
+                                    { name: '酒', amount1: '大さじ1/2', customAmounts: {} },
+                                    { name: 'すりおろし生姜', amount1: '小さじ1', customAmounts: { self: '小さじ2' } }
+                                ]
+                            },
+                            {
+                                title: '付け合わせ',
+                                showLine: true,
+                                items: [
+                                    { name: 'キャベツ（千切り）', amount1: '適量', customAmounts: {} },
+                                    { name: 'ミニトマト', amount1: '2個', customAmounts: {} }
+                                ]
+                            }
+                        ],
+                        steps: [
+                            '玉ねぎは薄切りにする。(A)の調味料を混ぜ合わせておく。',
+                            'フライパンにサラダ油を中火で熱し、豚肉と玉ねぎを炒める。',
+                            '肉の色が変わったら(A)を回し入れ、全体に照りが出るまで絡める。',
+                            '付け合わせのキャベツ・ミニトマトと一緒に器に盛って完成。'
+                        ],
+                        createdAt: now - 4000,
+                        order: 0
+                    },
+                    {
+                        id: 'sample-chicken-nanban',
+                        title: 'チキン南蛮',
+                        category: 'main',
+                        memo: '鶏肉は揚げ焼きでもカリッと仕上がります。甘酢ダレは温かいうちに絡めるのがコツ。',
+                        groups: [
+                            {
+                                title: 'メイン',
+                                showLine: false,
+                                items: [
+                                    { name: '鶏もも肉', amount1: '150g', customAmounts: {} },
+                                    { name: 'サラダ油（揚げ焼き用）', amount1: '大さじ2', customAmounts: {} }
+                                ]
+                            },
+                            {
+                                title: '下味と衣',
+                                showLine: true,
+                                items: [
+                                    { name: '塩こしょう', amount1: '少々', customAmounts: {} },
+                                    { name: '薄力粉', amount1: '大さじ1.5', customAmounts: {} },
+                                    { name: '溶き卵', amount1: '1/2個分', customAmounts: {} }
+                                ]
+                            },
+                            {
+                                title: '甘酢ダレ',
+                                showLine: true,
+                                items: [
+                                    { name: '酢', amount1: '大さじ1', customAmounts: {} },
+                                    { name: 'しょうゆ', amount1: '大さじ1', customAmounts: {} },
+                                    { name: '砂糖', amount1: '大さじ1', customAmounts: {} }
+                                ]
+                            },
+                            {
+                                title: 'タルタルソース',
+                                showLine: true,
+                                items: [
+                                    { name: 'ゆで卵', amount1: '1個', customAmounts: {} },
+                                    { name: '玉ねぎ（みじん切り）', amount1: '大さじ1', customAmounts: {} },
+                                    { name: 'マヨネーズ', amount1: '大さじ2', customAmounts: {} },
+                                    { name: 'レモン汁', amount1: '小さじ1/2', customAmounts: {} },
+                                    { name: '塩こしょう', amount1: '少々', customAmounts: {} }
+                                ]
+                            }
+                        ],
+                        steps: [
+                            'タルタルソースのゆで卵を細かく刻み、他の材料と混ぜ合わせておく。甘酢ダレも混ぜておく。',
+                            '鶏もも肉は一口大に切り、塩こしょうを振って薄力粉をまぶし、溶き卵にくぐらせる。',
+                            'フライパンにサラダ油を中火で熱し、鶏肉の両面をこんがり揚げ焼きにする。',
+                            '熱々の鶏肉を甘酢ダレにくぐらせて器に盛り、タルタルソースをたっぷりかけて完成。'
+                        ],
+                        createdAt: now - 3000,
+                        order: 1
+                    },
+                    {
+                        id: 'sample-kinpira',
+                        title: 'きんぴらごぼう',
+                        category: 'side',
+                        memo: 'ごぼうは水にさらしてアクを抜くと、色がきれいに仕上がります。',
+                        groups: [
+                            {
+                                title: '食材',
+                                showLine: false,
+                                items: [
+                                    { name: 'ごぼう', amount1: '1/2本（約75g）', customAmounts: {} },
+                                    { name: 'にんじん', amount1: '1/4本', customAmounts: {} },
+                                    { name: 'ごま油', amount1: '小さじ2', customAmounts: {} }
+                                ]
+                            },
+                            {
+                                title: '(A)',
+                                showLine: true,
+                                items: [
+                                    { name: 'しょうゆ', amount1: '大さじ1', customAmounts: {} },
+                                    { name: 'みりん', amount1: '大さじ1/2', customAmounts: {} },
+                                    { name: '砂糖', amount1: '小さじ1', customAmounts: {} },
+                                    { name: '顆粒和風だし', amount1: '小さじ1/2', customAmounts: {} }
+                                ]
+                            },
+                            {
+                                title: '仕上げ',
+                                showLine: false,
+                                items: [
+                                    { name: '白いりごま', amount1: '大さじ1', customAmounts: {} },
+                                    { name: '七味唐辛子', amount1: 'お好みで', customAmounts: {} }
+                                ]
+                            }
+                        ],
+                        steps: [
+                            'ごぼうは細切りにして水に5分ほどさらし、水気を切る。にんじんも細切りにする。',
+                            'フライパンにごま油を中火で熱し、ごぼうとにんじんをしんなりするまで炒める。',
+                            '(A)を加えて汁気がなくなるまで炒め煮にする。',
+                            '火を止めて白いりごまを和え、お好みで七味唐辛子を振って完成。'
+                        ],
+                        createdAt: now - 2000,
+                        order: 2
+                    },
+                    {
+                        id: 'sample-miso-soup',
+                        title: '豆腐とわかめの味噌汁',
+                        category: 'soup',
+                        memo: '味噌は火を止めてから溶き入れると香りが引き立ちます。',
+                        groups: [
+                            {
+                                title: '食材',
+                                showLine: false,
+                                items: [
+                                    { name: '絹ごし豆腐', amount1: '1/4丁', customAmounts: {} },
+                                    { name: '乾燥わかめ', amount1: '小さじ1/2', customAmounts: {} },
+                                    { name: '長ねぎ（小口切り）', amount1: '適量', customAmounts: {} }
+                                ]
+                            },
+                            {
+                                title: 'だし・調味料',
+                                showLine: true,
+                                items: [
+                                    { name: '水', amount1: '200ml', customAmounts: {} },
+                                    { name: '和風だしの素', amount1: '小さじ1/2', customAmounts: {} },
+                                    { name: '味噌', amount1: '大さじ1', customAmounts: {} }
+                                ]
+                            }
+                        ],
+                        steps: [
+                            '豆腐は1.5cm角に切る。乾燥わかめはさっと水で戻しておく。',
+                            '鍋に水とだしの素を入れて中火にかけ、煮立ったら豆腐とわかめを加える。',
+                            'ひと煮立ちしたら火を止め、味噌を溶き入れる。器に盛り、長ねぎを散らして完成。'
+                        ],
+                        createdAt: now - 1000,
+                        order: 3
+                    }
+                ];
+            }
+
+            // --------------------------------------------------
+            // データ正規化（安全設計）
+            // --------------------------------------------------
+            function sanitizeCategory(cat) {
+                return Object.prototype.hasOwnProperty.call(CATEGORIES, cat) ? cat : 'main';
+            }
+
+            function normalizeItem(rawItem) {
+                if (!rawItem || typeof rawItem !== 'object') {
+                    return { name: '', amount1: '', customAmounts: {} };
+                }
+                const customAmounts = {};
+                if (rawItem.customAmounts && typeof rawItem.customAmounts === 'object') {
+                    ['self', '2', '3', '4', '5'].forEach(function (k) {
+                        const val = rawItem.customAmounts[k];
+                        if (typeof val === 'string' && val.trim() !== '') {
+                            customAmounts[k] = val.trim();
+                        }
+                    });
+                }
+                return {
+                    name: typeof rawItem.name === 'string' ? rawItem.name : '',
+                    amount1: typeof rawItem.amount1 === 'string' ? rawItem.amount1 : '',
+                    customAmounts: customAmounts
+                };
+            }
+
+            function normalizeGroup(rawGroup) {
+                if (!rawGroup || typeof rawGroup !== 'object') {
+                    return { title: '食材', showLine: false, items: [] };
+                }
+                const items = Array.isArray(rawGroup.items)
+                    ? rawGroup.items.map(normalizeItem)
+                    : [];
+                return {
+                    title: typeof rawGroup.title === 'string' ? rawGroup.title : '',
+                    showLine: Boolean(rawGroup.showLine),
+                    items: items
+                };
+            }
+
+            function normalizeRecipe(raw, idx) {
+                const safeIdx = typeof idx === 'number' ? idx : 0;
+                if (!raw || typeof raw !== 'object') {
+                    return {
+                        id: 'recipe-fallback-' + Date.now() + '-' + safeIdx,
+                        title: '無題のレシピ',
+                        category: 'main',
+                        memo: '',
+                        groups: [{ title: '食材', showLine: false, items: [] }],
+                        steps: [],
+                        createdAt: Date.now() - safeIdx * 1000,
+                        order: safeIdx
+                    };
+                }
+
+                let groups = [];
+                if (Array.isArray(raw.groups) && raw.groups.length > 0) {
+                    groups = raw.groups.map(normalizeGroup);
+                } else if (Array.isArray(raw.ingredients) && raw.ingredients.length > 0) {
+                    groups = [{
+                        title: '食材',
+                        showLine: false,
+                        items: raw.ingredients.map(normalizeItem)
+                    }];
+                } else {
+                    groups = [];
+                }
+
+                const steps = Array.isArray(raw.steps)
+                    ? raw.steps.map(function (s) { return typeof s === 'string' ? s : String(s || ''); }).filter(function (s) { return s.trim() !== ''; })
+                    : [];
+
+                return {
+                    id: (typeof raw.id === 'string' && raw.id.trim() !== '') ? raw.id : ('recipe-' + Date.now() + '-' + safeIdx),
+                    title: (typeof raw.title === 'string' && raw.title.trim() !== '') ? raw.title : '無題のレシピ',
+                    category: sanitizeCategory(raw.category),
+                    memo: typeof raw.memo === 'string' ? raw.memo : '',
+                    groups: groups,
+                    steps: steps,
+                    createdAt: typeof raw.createdAt === 'number' && !isNaN(raw.createdAt) ? raw.createdAt : (Date.now() - safeIdx * 1000),
+                    order: typeof raw.order === 'number' && !isNaN(raw.order) ? raw.order : safeIdx
+                };
+            }
+
+            // --------------------------------------------------
+            // 分量スケーリング計算（整数・小数・分数・帯分数・全角対応）
+            // --------------------------------------------------
+            function gcd(a, b) {
+                a = Math.abs(a);
+                b = Math.abs(b);
+                while (b !== 0) {
+                    const t = b;
+                    b = a % b;
+                    a = t;
+                }
+                return a || 1;
+            }
+
+            function formatFraction(num, den) {
+                if (!den) return '';
+                const d = gcd(num, den);
+                const n = num / d;
+                const m = den / d;
+                if (m === 1) return String(n);
+                if (m === 2 && n > 2) return String(n / 2);
+                if (n > m) {
+                    const whole = Math.floor(n / m);
+                    const rem = n % m;
+                    return whole + 'と' + rem + '/' + m;
+                }
+                return n + '/' + m;
+            }
+
+            function scaleAmountString(amountStr, multiplier) {
+                if (typeof amountStr !== 'string') return '';
+                const trimmed = amountStr.trim();
+                if (!trimmed || multiplier === 1) return trimmed;
+
+                const normalized = trimmed
+                    .replace(/[０-９]/g, function (s) { return String.fromCharCode(s.charCodeAt(0) - 0xFEE0); })
+                    .replace(/．/g, '.')
+                    .replace(/／/g, '/');
+
+                const pattern = /(\d+)\s*と\s*(\d+)\s*\/\s*(\d+)|(\d+)\s*\/\s*(\d+)|\d+(?:\.\d+)?/g;
+
+                return normalized.replace(pattern, function (match, wholeStr, mNumStr, mDenStr, numStr, denStr) {
+                    if (wholeStr !== undefined && mNumStr !== undefined && mDenStr !== undefined) {
+                        const whole = parseInt(wholeStr, 10);
+                        const num = parseInt(mNumStr, 10);
+                        const den = parseInt(mDenStr, 10);
+                        if (!den) return match;
+                        return formatFraction((whole * den + num) * multiplier, den);
+                    }
+                    if (numStr !== undefined && denStr !== undefined) {
+                        const num = parseInt(numStr, 10);
+                        const den = parseInt(denStr, 10);
+                        if (!den) return match;
+                        return formatFraction(num * multiplier, den);
+                    }
+                    const val = parseFloat(match);
+                    if (isNaN(val)) return match;
+                    return String(Number((val * multiplier).toFixed(4)));
+                });
+            }
+
+            function getAutoAmount(amount1, servingKey) {
+                if (servingKey === '1' || servingKey === 'self') return amount1 || '';
+                const mult = parseInt(servingKey, 10);
+                if (isNaN(mult) || mult <= 1) return amount1 || '';
+                return scaleAmountString(amount1 || '', mult);
+            }
+
+            function resolveItemAmount(item, servingKey) {
+                if (servingKey === '1') {
+                    return { text: item.amount1 || '', isCustom: false };
+                }
+                const customVal = item.customAmounts && typeof item.customAmounts[servingKey] === 'string'
+                    ? item.customAmounts[servingKey].trim()
+                    : '';
+                if (customVal !== '') {
+                    return { text: customVal, isCustom: true };
+                }
+                return { text: getAutoAmount(item.amount1 || '', servingKey), isCustom: false };
+            }
+
+            function hasCustomInGroups(groups, servingKey) {
+                if (servingKey === '1' || !Array.isArray(groups)) return false;
+                return groups.some(function (g) {
+                    return Array.isArray(g.items) && g.items.some(function (item) {
+                        return item.customAmounts &&
+                            typeof item.customAmounts[servingKey] === 'string' &&
+                            item.customAmounts[servingKey].trim() !== '';
+                    });
+                });
+            }
+
+            function countTotalIngredients(recipe) {
+                if (!recipe || !Array.isArray(recipe.groups)) return 0;
+                return recipe.groups.reduce(function (sum, g) {
+                    return sum + (Array.isArray(g.items) ? g.items.length : 0);
+                }, 0);
+            }
+
+            function hasFilledItemsInGroup(group) {
+                if (!group || !Array.isArray(group.items)) return false;
+                return group.items.some(function (it) {
+                    return (it.name && it.name.trim() !== '') || (it.amount1 && it.amount1.trim() !== '');
+                });
+            }
+
+            // --------------------------------------------------
+            // DOMContentLoaded で安全に初期化
+            // --------------------------------------------------
+            document.addEventListener('DOMContentLoaded', function () {
+                try {
+                    initApp();
+                } catch (fatalErr) {
+                    console.error('アプリ初期化エラー:', fatalErr);
+                }
+            });
+
+            function initApp() {
+                // アプリ状態
+                let recipes = [];
+                let activeCategoryTab = 'all';
+                let sortBy = 'manual';
+                let selectedRecipeId = null;
+                let detailServingKey = '1';
+                let checkedKeys = new Set();
+
+                // 編集モーダル状態
+                let editingRecipeId = null;
+                let modalCategory = 'main';
+                let modalServingTab = '1';
+                let modalGroups = [];
+
+                // 確認モーダルコールバック
+                let confirmActionCallback = null;
+                let toastTimer = null;
+
+                // 一覧カード ドラッグ＆ドロップ状態
+                const listDragState = {
+                    active: false,
+                    pendingTimer: null,
+                    pointerId: null,
+                    startX: 0,
+                    startY: 0,
+                    offsetY: 0,
+                    draggedCard: null,
+                    ghostEl: null,
+                    placeholderEl: null,
+                    justDragged: false
+                };
+
+                // 編集グループ ドラッグ＆ドロップ状態
+                const groupDragState = {
+                    active: false,
+                    pendingTimer: null,
+                    pointerId: null,
+                    startX: 0,
+                    startY: 0,
+                    offsetY: 0,
+                    draggedCard: null,
+                    ghostEl: null,
+                    placeholderEl: null
+                };
+
+                // DOM要素の取得
+                const headerLogoBtn = document.getElementById('headerLogoBtn');
+                const openBackupModalBtn = document.getElementById('openBackupModalBtn');
+                const openAddModalBtn = document.getElementById('openAddModalBtn');
+                const emptyAddBtn = document.getElementById('emptyAddBtn');
+                const appVersionBadge = document.getElementById('appVersionBadge');
+
+                const listView = document.getElementById('listView');
+                const detailView = document.getElementById('detailView');
+
+                const categoryTabsEl = document.getElementById('categoryTabs');
+                const countAllEl = document.getElementById('countAll');
+                const countMainEl = document.getElementById('countMain');
+                const countSideEl = document.getElementById('countSide');
+                const countSoupEl = document.getElementById('countSoup');
+
+                const recipeCountEl = document.getElementById('recipeCount');
+                const sortSelect = document.getElementById('sortSelect');
+                const manualSortHint = document.getElementById('manualSortHint');
+                const recipeListContainer = document.getElementById('recipeListContainer');
+                const emptyState = document.getElementById('emptyState');
+                const emptyStateTitle = document.getElementById('emptyStateTitle');
+                const emptyStateDesc = document.getElementById('emptyStateDesc');
+
+                const backToListBtn = document.getElementById('backToListBtn');
+                const editRecipeBtn = document.getElementById('editRecipeBtn');
+                const deleteRecipeBtn = document.getElementById('deleteRecipeBtn');
+                const detailCategoryBadge = document.getElementById('detailCategoryBadge');
+                const detailTitle = document.getElementById('detailTitle');
+                const detailCustomBadge = document.getElementById('detailCustomBadge');
+                const detailServingSelector = document.getElementById('detailServingSelector');
+                const detailServingNote = document.getElementById('detailServingNote');
+                const resetCheckBtn = document.getElementById('resetCheckBtn');
+                const detailIngredientGroups = document.getElementById('detailIngredientGroups');
+                const detailSteps = document.getElementById('detailSteps');
+                const detailMemoSection = document.getElementById('detailMemoSection');
+                const detailMemoText = document.getElementById('detailMemoText');
+
+                const recipeModal = document.getElementById('recipeModal');
+                const recipeModalBody = document.getElementById('recipeModalBody');
+                const modalTitle = document.getElementById('modalTitle');
+                const closeModalBtn = document.getElementById('closeModalBtn');
+                const cancelModalBtn = document.getElementById('cancelModalBtn');
+                const recipeForm = document.getElementById('recipeForm');
+                const formError = document.getElementById('formError');
+                const inputTitle = document.getElementById('inputTitle');
+                const categoryPicker = document.getElementById('categoryPicker');
+                const editorServingTabs = document.getElementById('editorServingTabs');
+                const editorHintText = document.getElementById('editorHintText');
+                const resetServingCustomBtn = document.getElementById('resetServingCustomBtn');
+                const editorGroupsContainer = document.getElementById('editorGroupsContainer');
+                const groupPresetBox = document.getElementById('groupPresetBox');
+                const presetChipsContainer = document.getElementById('presetChipsContainer');
+                const inputSteps = document.getElementById('inputSteps');
+                const inputMemo = document.getElementById('inputMemo');
+
+                const backupModal = document.getElementById('backupModal');
+                const closeBackupModalBtn = document.getElementById('closeBackupModalBtn');
+                const doneBackupModalBtn = document.getElementById('doneBackupModalBtn');
+                const backupError = document.getElementById('backupError');
+                const exportJsonFileBtn = document.getElementById('exportJsonFileBtn');
+                const copyJsonTextBtn = document.getElementById('copyJsonTextBtn');
+                const importFileInput = document.getElementById('importFileInput');
+                const triggerFileImportBtn = document.getElementById('triggerFileImportBtn');
+                const importJsonTextarea = document.getElementById('importJsonTextarea');
+                const importTextBtn = document.getElementById('importTextBtn');
+                const backupVersionText = document.getElementById('backupVersionText');
+
+                const confirmModal = document.getElementById('confirmModal');
+                const confirmModalTitle = document.getElementById('confirmModalTitle');
+                const confirmModalDesc = document.getElementById('confirmModalDesc');
+                const cancelConfirmBtn = document.getElementById('cancelConfirmBtn');
+                const okConfirmBtn = document.getElementById('okConfirmBtn');
+
+                const toastEl = document.getElementById('toast');
+                const toastMessageEl = document.getElementById('toastMessage');
+
+                // バージョン表示を反映
+                appVersionBadge.textContent = APP_VERSION;
+                backupVersionText.textContent = APP_VERSION;
+
+                // --------------------------------------------------
+                // ストレージ読み書き（旧データ自動引き継ぎ＆try-catch保護）
+                // --------------------------------------------------
+                function loadData() {
+                    try {
+                        let raw = window.localStorage.getItem(STORAGE_KEY);
+                        // 旧バージョンのデータがあれば自動移行
+                        if (raw === null) {
+                            const legacy = window.localStorage.getItem(LEGACY_STORAGE_KEY);
+                            if (legacy !== null) {
+                                raw = legacy;
+                            }
+                        }
+
+                        if (raw !== null) {
+                            const parsed = JSON.parse(raw);
+                            if (Array.isArray(parsed)) {
+                                recipes = parsed.map(normalizeRecipe);
+                                saveData();
+                            } else {
+                                recipes = createSampleRecipes().map(normalizeRecipe);
+                                saveData();
+                            }
+                        } else {
+                            recipes = createSampleRecipes().map(normalizeRecipe);
+                            saveData();
+                        }
+                    } catch (err) {
+                        console.warn('localStorage読み込みフォールバック:', err);
+                        recipes = createSampleRecipes().map(normalizeRecipe);
+                    }
+
+                    try {
+                        const savedSort = window.localStorage.getItem(SORT_STORAGE_KEY);
+                        if (savedSort && ['manual', 'newest', 'oldest', 'name'].includes(savedSort)) {
+                            sortBy = savedSort;
+                        }
+                        sortSelect.value = sortBy;
+                    } catch (_) {
+                        sortBy = 'manual';
+                    }
+                }
+
+                function saveData() {
+                    try {
+                        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(recipes));
+                    } catch (err) {
+                        console.warn('localStorage保存エラー:', err);
+                        showToast('保存に失敗しました（ストレージ設定をご確認ください）');
+                    }
+                }
+
+                function saveSortPreference() {
+                    try {
+                        window.localStorage.setItem(SORT_STORAGE_KEY, sortBy);
+                    } catch (_) {}
+                }
+
+                function showToast(msg) {
+                    toastMessageEl.textContent = msg;
+                    toastEl.classList.add('show');
+                    if (toastTimer) clearTimeout(toastTimer);
+                    toastTimer = setTimeout(function () {
+                        toastEl.classList.remove('show');
+                    }, 2400);
+                }
+
+                function parseLines(text) {
+                    return String(text || '')
+                        .split(/\r?\n/)
+                        .map(function (l) { return l.trim(); })
+                        .filter(function (l) { return l.length > 0; });
+                }
+
+                function normalizeManualOrder() {
+                    const sorted = recipes.slice().sort(function (a, b) {
+                        return (a.order || 0) - (b.order || 0);
+                    });
+                    sorted.forEach(function (r, idx) {
+                        r.order = idx;
+                    });
+                }
+
+                function getFilteredAndSortedRecipes() {
+                    const list = activeCategoryTab === 'all'
+                        ? recipes.slice()
+                        : recipes.filter(function (r) { return r.category === activeCategoryTab; });
+
+                    if (sortBy === 'manual') {
+                        return list.sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
+                    }
+                    if (sortBy === 'newest') {
+                        return list.sort(function (a, b) { return (b.createdAt || 0) - (a.createdAt || 0); });
+                    }
+                    if (sortBy === 'oldest') {
+                        return list.sort(function (a, b) { return (a.createdAt || 0) - (b.createdAt || 0); });
+                    }
+                    if (sortBy === 'name') {
+                        return list.sort(function (a, b) { return a.title.localeCompare(b.title, 'ja'); });
+                    }
+                    return list;
+                }
+
+                function updateBodyScrollLock() {
+                    const anyOpen =
+                        !recipeModal.classList.contains('hidden') ||
+                        !backupModal.classList.contains('hidden') ||
+                        !confirmModal.classList.contains('hidden');
+                    document.body.classList.toggle('no-scroll', anyOpen);
+                }
+
+                // --------------------------------------------------
+                // 共通確認モーダル（alert / confirm の代替）
+                // --------------------------------------------------
+                function openConfirmDialog(title, desc, okLabel, onConfirm) {
+                    confirmModalTitle.textContent = title;
+                    confirmModalDesc.textContent = desc;
+                    okConfirmBtn.textContent = okLabel || '削除する';
+                    confirmActionCallback = onConfirm;
+                    confirmModal.classList.remove('hidden');
+                    updateBodyScrollLock();
+                }
+
+                function closeConfirmDialog() {
+                    confirmModal.classList.add('hidden');
+                    confirmActionCallback = null;
+                    updateBodyScrollLock();
+                }
+
+                // --------------------------------------------------
+                // データ管理（JSON書き出し・読み込み）
+                // --------------------------------------------------
+                function buildBackupPayload() {
+                    return JSON.stringify({
+                        app: 'MogMog',
+                        version: APP_VERSION,
+                        exportedAt: new Date().toISOString(),
+                        recipes: recipes
+                    }, null, 2);
+                }
+
+                function openBackupModal() {
+                    backupError.classList.add('hidden');
+                    backupError.textContent = '';
+                    importJsonTextarea.value = '';
+                    backupModal.classList.remove('hidden');
+                    updateBodyScrollLock();
+                }
+
+                function closeBackupModal() {
+                    backupModal.classList.add('hidden');
+                    updateBodyScrollLock();
+                }
+
+                function handleExportJsonFile() {
+                    try {
+                        const json = buildBackupPayload();
+                        const blob = new Blob([json], { type: 'application/json' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        const now = new Date();
+                        const pad = function (n) { return String(n).padStart(2, '0'); };
+                        const dateStr = now.getFullYear() + pad(now.getMonth() + 1) + pad(now.getDate());
+                        a.href = url;
+                        a.download = 'mogmog_backup_' + dateStr + '.json';
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+                        showToast('バックアップファイルを書き出しました');
+                    } catch (err) {
+                        console.error('書き出しエラー:', err);
+                        backupError.textContent = 'ファイルの書き出しに失敗しました。「テキストをコピー」をお試しください。';
+                        backupError.classList.remove('hidden');
+                    }
+                }
+
+                function handleCopyJsonText() {
+                    try {
+                        const json = buildBackupPayload();
+                        const temp = document.createElement('textarea');
+                        temp.value = json;
+                        temp.setAttribute('readonly', '');
+                        temp.style.position = 'fixed';
+                        temp.style.opacity = '0';
+                        temp.style.left = '-9999px';
+                        document.body.appendChild(temp);
+                        temp.select();
+                        temp.setSelectionRange(0, temp.value.length);
+                        const ok = document.execCommand('copy');
+                        temp.remove();
+                        if (ok) {
+                            showToast('バックアップ用JSONをコピーしました');
+                        } else {
+                            throw new Error('copy command failed');
+                        }
+                    } catch (err) {
+                        console.warn('コピー失敗:', err);
+                        backupError.textContent = 'コピーに失敗しました。代わりに「JSONをダウンロード」をお試しください。';
+                        backupError.classList.remove('hidden');
+                    }
+                }
+
+                function processImportJsonString(rawText) {
+                    backupError.classList.add('hidden');
+                    backupError.textContent = '';
+
+                    if (!rawText || !rawText.trim()) {
+                        backupError.textContent = '読み込むJSONデータが空です。';
+                        backupError.classList.remove('hidden');
+                        return;
+                    }
+
+                    let parsed;
+                    try {
+                        parsed = JSON.parse(rawText);
+                    } catch (_) {
+                        backupError.textContent = 'JSONの形式が正しくありません。バックアップしたデータをそのまま指定してください。';
+                        backupError.classList.remove('hidden');
+                        return;
+                    }
+
+                    // 配列直接、または { recipes: [...] } 形式の両方に対応
+                    let list = null;
+                    if (Array.isArray(parsed)) {
+                        list = parsed;
+                    } else if (parsed && Array.isArray(parsed.recipes)) {
+                        list = parsed.recipes;
+                    }
+
+                    if (!list) {
+                        backupError.textContent = 'レシピデータが見つかりませんでした。MogMogのバックアップファイルかご確認ください。';
+                        backupError.classList.remove('hidden');
+                        return;
+                    }
+
+                    const normalizedList = list.map(normalizeRecipe);
+
+                    openConfirmDialog(
+                        'レシピデータを復元しますか？',
+                        normalizedList.length + '件のレシピを読み込みます。現在保存されているレシピは上書きされます。',
+                        '復元する',
+                        function () {
+                            recipes = normalizedList;
+                            normalizeManualOrder();
+                            saveData();
+                            closeBackupModal();
+                            showListView();
+                            showToast(normalizedList.length + '件のレシピを復元しました');
+                        }
+                    );
+                }
+
+                // --------------------------------------------------
+                // 一覧画面の描画
+                // --------------------------------------------------
+                function updateCategoryTabCounts() {
+                    countAllEl.textContent = recipes.length;
+                    countMainEl.textContent = recipes.filter(function (r) { return r.category === 'main'; }).length;
+                    countSideEl.textContent = recipes.filter(function (r) { return r.category === 'side'; }).length;
+                    countSoupEl.textContent = recipes.filter(function (r) { return r.category === 'soup'; }).length;
+
+                    categoryTabsEl.querySelectorAll('.cat-tab').forEach(function (btn) {
+                        const active = btn.dataset.category === activeCategoryTab;
+                        btn.classList.toggle('active', active);
+                        btn.setAttribute('aria-selected', active ? 'true' : 'false');
+                    });
+                }
+
+                function renderList() {
+                    updateCategoryTabCounts();
+                    const visible = getFilteredAndSortedRecipes();
+                    recipeCountEl.textContent = visible.length;
+
+                    manualSortHint.classList.toggle('hidden', !(sortBy === 'manual' && visible.length > 1));
+                    recipeListContainer.innerHTML = '';
+
+                    if (visible.length === 0) {
+                        emptyState.classList.remove('hidden');
+                        if (activeCategoryTab === 'all') {
+                            emptyStateTitle.textContent = 'まだレシピがありません';
+                            emptyStateDesc.textContent = 'お気に入りの料理を登録して、自分だけのレシピ帳を作りましょう。';
+                        } else {
+                            const label = CATEGORIES[activeCategoryTab].label;
+                            emptyStateTitle.textContent = '「' + label + '」のレシピはまだありません';
+                            emptyStateDesc.textContent = '新しい' + label + 'レシピを追加してみましょう。';
+                        }
+                        return;
+                    }
+                    emptyState.classList.add('hidden');
+
+                    visible.forEach(function (recipe) {
+                        const catInfo = CATEGORIES[recipe.category] || CATEGORIES.main;
+                        const card = document.createElement('div');
+                        card.dataset.recipeId = recipe.id;
+                        card.className = sortBy === 'manual' ? 'recipe-card' : 'recipe-card no-handle';
+
+                        if (sortBy === 'manual') {
+                            const handle = document.createElement('div');
+                            handle.className = 'drag-handle';
+                            handle.setAttribute('aria-label', 'ドラッグして並び替え');
+                            handle.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 8h16M4 12h16M4 16h16"/></svg>';
+                            card.appendChild(handle);
+                        }
+
+                        const body = document.createElement('div');
+                        body.className = 'card-body';
+
+                        const topRow = document.createElement('div');
+                        topRow.className = 'card-top-row';
+
+                        const catBadge = document.createElement('span');
+                        catBadge.className = 'badge ' + catInfo.badgeClass;
+                        catBadge.textContent = catInfo.label;
+
+                        const titleEl = document.createElement('h2');
+                        titleEl.className = 'card-title';
+                        titleEl.textContent = recipe.title;
+
+                        topRow.appendChild(catBadge);
+                        topRow.appendChild(titleEl);
+
+                        const meta = document.createElement('div');
+                        meta.className = 'card-meta';
+
+                        const ingCount = document.createElement('span');
+                        ingCount.className = 'badge badge-info';
+                        ingCount.textContent = '材料 ' + countTotalIngredients(recipe) + '個';
+                        meta.appendChild(ingCount);
+
+                        const stepCount = document.createElement('span');
+                        stepCount.textContent = '手順 ' + recipe.steps.length + 'ステップ';
+                        meta.appendChild(stepCount);
+
+                        if (hasCustomInGroups(recipe.groups, 'self')) {
+                            const selfBadge = document.createElement('span');
+                            selfBadge.className = 'badge badge-self';
+                            selfBadge.textContent = '自分用あり';
+                            meta.appendChild(selfBadge);
+                        }
+
+                        body.appendChild(topRow);
+                        body.appendChild(meta);
+                        card.appendChild(body);
+
+                        const chevron = document.createElement('div');
+                        chevron.className = 'card-chevron';
+                        chevron.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>';
+                        card.appendChild(chevron);
+
+                        card.addEventListener('click', function () {
+                            if (listDragState.justDragged) return;
+                            openDetail(recipe.id);
+                        });
+
+                        if (sortBy === 'manual') {
+                            card.addEventListener('contextmenu', function (e) {
+                                if (sortBy === 'manual') e.preventDefault();
+                            });
+                            card.addEventListener('pointerdown', function (e) {
+                                handleListCardPointerDown(e, card);
+                            });
+                        }
+
+                        recipeListContainer.appendChild(card);
+                    });
+                }
+
+                // --------------------------------------------------
+                // 一覧カード：長押し＆ハンドル ドラッグ＆ドロップ並び替え
+                // --------------------------------------------------
+                function handleListCardPointerDown(e, card) {
+                    if (e.pointerType === 'mouse' && e.button !== 0) return;
+                    if (sortBy !== 'manual') return;
+
+                    const isHandle = Boolean(e.target.closest('.drag-handle'));
+                    clearListPendingDrag();
+
+                    listDragState.pointerId = e.pointerId;
+                    listDragState.startX = e.clientX;
+                    listDragState.startY = e.clientY;
+                    listDragState.draggedCard = card;
+
+                    if (isHandle) {
+                        e.preventDefault();
+                        startListDragging(e.clientY);
+                    } else {
+                        listDragState.pendingTimer = setTimeout(function () {
+                            listDragState.pendingTimer = null;
+                            startListDragging(listDragState.startY);
+                        }, 250);
+                    }
+
+                    window.addEventListener('pointermove', handleListPointerMove, { passive: false });
+                    window.addEventListener('pointerup', handleListPointerUp);
+                    window.addEventListener('pointercancel', handleListPointerUp);
+                }
+
+                function clearListPendingDrag() {
+                    if (listDragState.pendingTimer) {
+                        clearTimeout(listDragState.pendingTimer);
+                        listDragState.pendingTimer = null;
+                    }
+                }
+
+                function startListDragging(currentClientY) {
+                    const card = listDragState.draggedCard;
+                    if (!card) return;
+
+                    listDragState.active = true;
+                    listDragState.justDragged = true;
+
+                    if (navigator.vibrate) {
+                        try { navigator.vibrate(18); } catch (_) {}
+                    }
+
+                    const rect = card.getBoundingClientRect();
+                    listDragState.offsetY = currentClientY - rect.top;
+
+                    const placeholder = document.createElement('div');
+                    placeholder.className = 'drag-placeholder';
+                    placeholder.style.height = rect.height + 'px';
+                    placeholder.textContent = 'ここに移動';
+                    listDragState.placeholderEl = placeholder;
+
+                    const ghost = card.cloneNode(true);
+                    ghost.classList.add('drag-ghost');
+                    ghost.style.width = rect.width + 'px';
+                    ghost.style.left = rect.left + 'px';
+                    ghost.style.top = rect.top + 'px';
+                    document.body.appendChild(ghost);
+                    listDragState.ghostEl = ghost;
+
+                    card.parentNode.insertBefore(placeholder, card);
+                    card.classList.add('hidden');
+                    document.body.classList.add('is-dragging');
+                }
+
+                function handleListPointerMove(e) {
+                    if (e.pointerId !== listDragState.pointerId) return;
+
+                    if (!listDragState.active) {
+                        const dx = Math.abs(e.clientX - listDragState.startX);
+                        const dy = Math.abs(e.clientY - listDragState.startY);
+                        if (dx > 8 || dy > 8) {
+                            clearListPendingDrag();
+                            cleanupListPointerListeners();
+                        }
+                        return;
+                    }
+
+                    e.preventDefault();
+                    listDragState.ghostEl.style.top = (e.clientY - listDragState.offsetY) + 'px';
+
+                    const edge = 60;
+                    if (e.clientY < edge) {
+                        window.scrollBy(0, -10);
+                    } else if (e.clientY > window.innerHeight - edge) {
+                        window.scrollBy(0, 10);
+                    }
+
+                    const otherCards = Array.from(recipeListContainer.querySelectorAll('.recipe-card:not(.hidden)'));
+                    let insertBeforeEl = null;
+                    for (let i = 0; i < otherCards.length; i++) {
+                        const box = otherCards[i].getBoundingClientRect();
+                        if (e.clientY < box.top + box.height / 2) {
+                            insertBeforeEl = otherCards[i];
+                            break;
+                        }
+                    }
+
+                    if (insertBeforeEl) {
+                        recipeListContainer.insertBefore(listDragState.placeholderEl, insertBeforeEl);
+                    } else {
+                        recipeListContainer.appendChild(listDragState.placeholderEl);
+                    }
+                }
+
+                function handleListPointerUp(e) {
+                    if (e.pointerId !== listDragState.pointerId) return;
+
+                    clearListPendingDrag();
+                    cleanupListPointerListeners();
+
+                    if (!listDragState.active) return;
+
+                    const card = listDragState.draggedCard;
+                    if (listDragState.placeholderEl && listDragState.placeholderEl.parentNode) {
+                        listDragState.placeholderEl.parentNode.insertBefore(card, listDragState.placeholderEl);
+                        listDragState.placeholderEl.remove();
+                    }
+                    if (card) card.classList.remove('hidden');
+                    if (listDragState.ghostEl) listDragState.ghostEl.remove();
+                    document.body.classList.remove('is-dragging');
+
+                    const orderedIds = Array.from(recipeListContainer.querySelectorAll('.recipe-card'))
+                        .map(function (el) { return el.dataset.recipeId; });
+
+                    const visibleObjs = orderedIds
+                        .map(function (id) { return recipes.find(function (r) { return r.id === id; }); })
+                        .filter(Boolean);
+
+                    const slots = visibleObjs
+                        .map(function (r) { return r.order || 0; })
+                        .sort(function (a, b) { return a - b; });
+
+                    visibleObjs.forEach(function (obj, i) {
+                        obj.order = slots[i];
+                    });
+
+                    normalizeManualOrder();
+                    saveData();
+
+                    listDragState.active = false;
+                    listDragState.draggedCard = null;
+                    listDragState.ghostEl = null;
+                    listDragState.placeholderEl = null;
+
+                    setTimeout(function () {
+                        listDragState.justDragged = false;
+                    }, 120);
+                }
+
+                function cleanupListPointerListeners() {
+                    window.removeEventListener('pointermove', handleListPointerMove);
+                    window.removeEventListener('pointerup', handleListPointerUp);
+                    window.removeEventListener('pointercancel', handleListPointerUp);
+                }
+
+                // --------------------------------------------------
+                // 詳細画面の描画（クラシル風グループ表示＋人数切替）
+                // --------------------------------------------------
+                function renderDetailServingSelector(recipe) {
+                    detailServingSelector.innerHTML = '';
+
+                    DETAIL_SERVING_OPTIONS.forEach(function (opt) {
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.setAttribute('role', 'tab');
+                        const isActive = detailServingKey === opt.key;
+                        const hasCustom = hasCustomInGroups(recipe.groups, opt.key);
+
+                        btn.className = 'serving-pill' +
+                            (opt.key === 'self' ? ' is-self' : '') +
+                            (isActive ? ' active' : '');
+                        btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+
+                        const label = document.createElement('span');
+                        label.textContent = opt.label;
+                        btn.appendChild(label);
+
+                        if (hasCustom) {
+                            const dot = document.createElement('span');
+                            dot.className = 'pill-dot';
+                            dot.title = 'カスタム設定あり';
+                            btn.appendChild(dot);
+                        }
+
+                        btn.addEventListener('click', function () {
+                            if (detailServingKey === opt.key) return;
+                            detailServingKey = opt.key;
+                            renderDetailServingSelector(recipe);
+                            renderDetailIngredients(recipe);
+                        });
+
+                        detailServingSelector.appendChild(btn);
+                    });
+                }
+
+                function renderDetailIngredients(recipe) {
+                    const isCustomActive = hasCustomInGroups(recipe.groups, detailServingKey);
+                    detailCustomBadge.classList.toggle('hidden', !isCustomActive);
+
+                    if (detailServingKey === 'self') {
+                        detailServingNote.textContent = isCustomActive
+                            ? '自分用にカスタムされた分量を表示中（タップでチェック）'
+                            : '1人前と同じ分量を表示中（編集から自分用に調整できます）';
+                    } else if (detailServingKey === '1') {
+                        detailServingNote.textContent = '1人前（基準）の分量を表示中（タップでチェック）';
+                    } else {
+                        detailServingNote.textContent = isCustomActive
+                            ? detailServingKey + '人前（一部カスタム調整あり・タップでチェック）'
+                            : '1人前を自動で' + detailServingKey + '倍した分量を表示中（タップでチェック）';
+                    }
+
+                    resetCheckBtn.classList.toggle('hidden', checkedKeys.size === 0);
+                    detailIngredientGroups.innerHTML = '';
+
+                    const nonEmptyGroups = (recipe.groups || []).filter(function (g) {
+                        return Array.isArray(g.items) && g.items.length > 0;
+                    });
+
+                    if (nonEmptyGroups.length === 0) {
+                        const p = document.createElement('p');
+                        p.className = 'helper-text';
+                        p.textContent = '材料が登録されていません';
+                        detailIngredientGroups.appendChild(p);
+                        return;
+                    }
+
+                    nonEmptyGroups.forEach(function (group, gIdx) {
+                        const block = document.createElement('div');
+                        block.className = 'detail-group-block';
+
+                        if (group.title && group.title.trim() !== '') {
+                            const h4 = document.createElement('h4');
+                            h4.className = 'detail-group-title';
+                            h4.textContent = group.title.trim();
+                            block.appendChild(h4);
+                        }
+
+                        const ul = document.createElement('ul');
+                        ul.className = 'ingredient-list' + (group.showLine ? ' with-left-line' : '');
+
+                        group.items.forEach(function (item, iIdx) {
+                            const key = gIdx + '-' + iIdx;
+                            const isChecked = checkedKeys.has(key);
+                            const resolved = resolveItemAmount(item, detailServingKey);
+
+                            const li = document.createElement('li');
+                            li.className = 'ingredient-item' + (isChecked ? ' checked' : '');
+
+                            const left = document.createElement('div');
+                            left.className = 'ing-left';
+
+                            const checkBox = document.createElement('span');
+                            checkBox.className = 'ing-check';
+                            if (isChecked) {
+                                checkBox.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>';
+                            }
+
+                            const nameSpan = document.createElement('span');
+                            nameSpan.className = 'ing-name';
+                            nameSpan.textContent = item.name;
+
+                            left.appendChild(checkBox);
+                            left.appendChild(nameSpan);
+
+                            const amountSpan = document.createElement('span');
+                            let amountClass = 'ing-amount';
+                            if (detailServingKey === 'self' && resolved.isCustom) {
+                                amountClass += ' is-self-custom';
+                            } else if (detailServingKey !== '1' && detailServingKey !== 'self') {
+                                amountClass += ' is-scaled';
+                            }
+                            amountSpan.className = amountClass;
+                            amountSpan.textContent = resolved.text;
+
+                            li.appendChild(left);
+                            li.appendChild(amountSpan);
+
+                            li.addEventListener('click', function () {
+                                if (checkedKeys.has(key)) {
+                                    checkedKeys.delete(key);
+                                } else {
+                                    checkedKeys.add(key);
+                                }
+                                renderDetailIngredients(recipe);
+                            });
+
+                            ul.appendChild(li);
+                        });
+
+                        block.appendChild(ul);
+                        detailIngredientGroups.appendChild(block);
+                    });
+                }
+
+                function openDetail(id) {
+                    const recipe = recipes.find(function (r) { return r.id === id; });
+                    if (!recipe) return;
+
+                    selectedRecipeId = id;
+                    detailServingKey = '1';
+                    checkedKeys.clear();
+
+                    const catInfo = CATEGORIES[recipe.category] || CATEGORIES.main;
+                    detailCategoryBadge.className = 'badge ' + catInfo.badgeClass;
+                    detailCategoryBadge.textContent = catInfo.label;
+
+                    detailTitle.textContent = recipe.title;
+
+                    renderDetailServingSelector(recipe);
+                    renderDetailIngredients(recipe);
+
+                    detailSteps.innerHTML = '';
+                    if (!recipe.steps || recipe.steps.length === 0) {
+                        const li = document.createElement('li');
+                        li.className = 'helper-text';
+                        li.textContent = '作り方が登録されていません';
+                        detailSteps.appendChild(li);
+                    } else {
+                        recipe.steps.forEach(function (step, idx) {
+                            const li = document.createElement('li');
+                            li.className = 'step-item';
+
+                            const num = document.createElement('span');
+                            num.className = 'step-num';
+                            num.textContent = String(idx + 1);
+
+                            const p = document.createElement('p');
+                            p.className = 'step-text';
+                            p.textContent = step;
+
+                            li.appendChild(num);
+                            li.appendChild(p);
+                            detailSteps.appendChild(li);
+                        });
+                    }
+
+                    if (recipe.memo && recipe.memo.trim() !== '') {
+                        detailMemoText.textContent = recipe.memo.trim();
+                        detailMemoSection.classList.remove('hidden');
+                    } else {
+                        detailMemoSection.classList.add('hidden');
+                    }
+
+                    listView.classList.add('hidden');
+                    detailView.classList.remove('hidden');
+                    openAddModalBtn.classList.add('hidden');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+
+                function showListView() {
+                    selectedRecipeId = null;
+                    detailView.classList.add('hidden');
+                    listView.classList.remove('hidden');
+                    openAddModalBtn.classList.remove('hidden');
+                    renderList();
+                }
+
+                // --------------------------------------------------
+                // 編集モーダル：材料グループのドラッグ＆ドロップ並び替え
+                // --------------------------------------------------
+                function handleGroupPointerDown(e, card) {
+                    if (e.pointerType === 'mouse' && e.button !== 0) return;
+                    if (modalServingTab !== '1') return;
+                    if (e.target.closest('input, button, textarea, select')) return;
+
+                    const isHandle = Boolean(e.target.closest('.group-drag-handle'));
+                    const isHeader = Boolean(e.target.closest('.editor-group-header'));
+                    if (!isHandle && !isHeader) return;
+
+                    clearGroupPendingDrag();
+
+                    groupDragState.pointerId = e.pointerId;
+                    groupDragState.startX = e.clientX;
+                    groupDragState.startY = e.clientY;
+                    groupDragState.draggedCard = card;
+
+                    if (isHandle) {
+                        e.preventDefault();
+                        startGroupDragging(e.clientY);
+                    } else {
+                        groupDragState.pendingTimer = setTimeout(function () {
+                            groupDragState.pendingTimer = null;
+                            startGroupDragging(groupDragState.startY);
+                        }, 250);
+                    }
+
+                    window.addEventListener('pointermove', handleGroupPointerMove, { passive: false });
+                    window.addEventListener('pointerup', handleGroupPointerUp);
+                    window.addEventListener('pointercancel', handleGroupPointerUp);
+                }
+
+                function clearGroupPendingDrag() {
+                    if (groupDragState.pendingTimer) {
+                        clearTimeout(groupDragState.pendingTimer);
+                        groupDragState.pendingTimer = null;
+                    }
+                }
+
+                function startGroupDragging(currentClientY) {
+                    const card = groupDragState.draggedCard;
+                    if (!card) return;
+
+                    groupDragState.active = true;
+
+                    if (navigator.vibrate) {
+                        try { navigator.vibrate(18); } catch (_) {}
+                    }
+
+                    const rect = card.getBoundingClientRect();
+                    groupDragState.offsetY = currentClientY - rect.top;
+
+                    const placeholder = document.createElement('div');
+                    placeholder.className = 'drag-placeholder';
+                    placeholder.style.height = Math.max(64, rect.height) + 'px';
+                    placeholder.textContent = 'ここにグループを移動';
+                    groupDragState.placeholderEl = placeholder;
+
+                    const ghost = card.cloneNode(true);
+                    ghost.classList.add('drag-ghost');
+                    ghost.style.width = rect.width + 'px';
+                    ghost.style.left = rect.left + 'px';
+                    ghost.style.top = rect.top + 'px';
+                    document.body.appendChild(ghost);
+                    groupDragState.ghostEl = ghost;
+
+                    card.parentNode.insertBefore(placeholder, card);
+                    card.classList.add('hidden');
+                    document.body.classList.add('is-dragging');
+                }
+
+                function handleGroupPointerMove(e) {
+                    if (e.pointerId !== groupDragState.pointerId) return;
+
+                    if (!groupDragState.active) {
+                        const dx = Math.abs(e.clientX - groupDragState.startX);
+                        const dy = Math.abs(e.clientY - groupDragState.startY);
+                        if (dx > 8 || dy > 8) {
+                            clearGroupPendingDrag();
+                            cleanupGroupPointerListeners();
+                        }
+                        return;
+                    }
+
+                    e.preventDefault();
+                    groupDragState.ghostEl.style.top = (e.clientY - groupDragState.offsetY) + 'px';
+
+                    // モーダル内の自動スクロール
+                    const modalRect = recipeModalBody.getBoundingClientRect();
+                    const scrollEdge = 54;
+                    if (e.clientY < modalRect.top + scrollEdge) {
+                        recipeModalBody.scrollTop -= 10;
+                    } else if (e.clientY > modalRect.bottom - scrollEdge) {
+                        recipeModalBody.scrollTop += 10;
+                    }
+
+                    const otherCards = Array.from(editorGroupsContainer.querySelectorAll('.editor-group-card:not(.hidden)'));
+                    let insertBeforeEl = null;
+                    for (let i = 0; i < otherCards.length; i++) {
+                        const box = otherCards[i].getBoundingClientRect();
+                        if (e.clientY < box.top + box.height / 2) {
+                            insertBeforeEl = otherCards[i];
+                            break;
+                        }
+                    }
+
+                    if (insertBeforeEl) {
+                        editorGroupsContainer.insertBefore(groupDragState.placeholderEl, insertBeforeEl);
+                    } else {
+                        editorGroupsContainer.appendChild(groupDragState.placeholderEl);
+                    }
+                }
+
+                function handleGroupPointerUp(e) {
+                    if (e.pointerId !== groupDragState.pointerId) return;
+
+                    clearGroupPendingDrag();
+                    cleanupGroupPointerListeners();
+
+                    if (!groupDragState.active) return;
+
+                    const card = groupDragState.draggedCard;
+                    if (groupDragState.placeholderEl && groupDragState.placeholderEl.parentNode) {
+                        groupDragState.placeholderEl.parentNode.insertBefore(card, groupDragState.placeholderEl);
+                        groupDragState.placeholderEl.remove();
+                    }
+                    if (card) card.classList.remove('hidden');
+                    if (groupDragState.ghostEl) groupDragState.ghostEl.remove();
+                    document.body.classList.remove('is-dragging');
+
+                    const orderedIndexes = Array.from(editorGroupsContainer.querySelectorAll('.editor-group-card'))
+                        .map(function (el) { return parseInt(el.dataset.groupIndex, 10); })
+                        .filter(function (n) { return !isNaN(n); });
+
+                    if (orderedIndexes.length === modalGroups.length) {
+                        modalGroups = orderedIndexes.map(function (oldIdx) {
+                            return modalGroups[oldIdx];
+                        });
+                    }
+
+                    groupDragState.active = false;
+                    groupDragState.draggedCard = null;
+                    groupDragState.ghostEl = null;
+                    groupDragState.placeholderEl = null;
+
+                    renderEditorGroupsArea();
+                }
+
+                function cleanupGroupPointerListeners() {
+                    window.removeEventListener('pointermove', handleGroupPointerMove);
+                    window.removeEventListener('pointerup', handleGroupPointerUp);
+                    window.removeEventListener('pointercancel', handleGroupPointerUp);
+                }
+
+                // --------------------------------------------------
+                // 追加・編集モーダル描画
+                // --------------------------------------------------
+                function renderPresetChips() {
+                    presetChipsContainer.innerHTML = '';
+                    GROUP_PRESETS.forEach(function (preset) {
+                        const chip = document.createElement('button');
+                        chip.type = 'button';
+                        chip.className = 'preset-chip' + (preset.isFree ? ' is-free' : '');
+                        chip.textContent = '＋ ' + preset.label;
+                        chip.addEventListener('click', function () {
+                            modalGroups.push({
+                                title: preset.title,
+                                showLine: preset.showLine,
+                                items: [{ name: '', amount1: '', customAmounts: {} }]
+                            });
+                            renderEditorGroupsArea();
+                            const cards = editorGroupsContainer.querySelectorAll('.editor-group-card');
+                            if (cards.length > 0) {
+                                const lastCard = cards[cards.length - 1];
+                                const focusTarget = preset.isFree
+                                    ? lastCard.querySelector('.group-title-input')
+                                    : lastCard.querySelector('.ing-base-row .text-input');
+                                if (focusTarget) focusTarget.focus();
+                            }
+                        });
+                        presetChipsContainer.appendChild(chip);
+                    });
+                }
+
+                function updateCategoryPickerUI() {
+                    categoryPicker.querySelectorAll('.cat-pick-btn').forEach(function (btn) {
+                        btn.classList.toggle('active', btn.dataset.cat === modalCategory);
+                    });
+                }
+
+                function renderEditorServingTabs() {
+                    editorServingTabs.innerHTML = '';
+                    EDITOR_SERVING_OPTIONS.forEach(function (opt) {
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.setAttribute('role', 'tab');
+                        btn.dataset.serving = opt.key;
+                        const isActive = modalServingTab === opt.key;
+                        const hasCustom = hasCustomInGroups(modalGroups, opt.key);
+
+                        btn.className = 'editor-tab-btn' + (isActive ? ' active' : '');
+                        btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+
+                        const label = document.createElement('span');
+                        label.textContent = opt.label;
+                        btn.appendChild(label);
+
+                        if (hasCustom) {
+                            const dot = document.createElement('span');
+                            dot.className = 'tab-custom-dot';
+                            btn.appendChild(dot);
+                        }
+
+                        btn.addEventListener('click', function () {
+                            if (modalServingTab === opt.key) return;
+                            modalServingTab = opt.key;
+                            renderEditorServingTabs();
+                            renderEditorGroupsArea();
+                        });
+
+                        editorServingTabs.appendChild(btn);
+                    });
+                }
+
+                function deleteGroupAtIndex(gIdx) {
+                    modalGroups.splice(gIdx, 1);
+                    renderEditorServingTabs();
+                    renderEditorGroupsArea();
+                    showToast('グループを削除しました');
+                }
+
+                function renderEditorGroupsArea() {
+                    editorGroupsContainer.innerHTML = '';
+
+                    if (modalServingTab === '1') {
+                        editorHintText.textContent = '基準となる「1人前」の材料をグループごとに入力。左の「≡」で上下に並び替えできます。';
+                        resetServingCustomBtn.classList.add('hidden');
+                        groupPresetBox.classList.remove('hidden');
+
+                        if (modalGroups.length === 0) {
+                            const emptyDiv = document.createElement('div');
+                            emptyDiv.className = 'editor-empty-groups';
+                            emptyDiv.textContent = 'グループがありません。下のボタンから「食材」「(A)」「ソース・タレ」などを追加してください。';
+                            editorGroupsContainer.appendChild(emptyDiv);
+                            return;
+                        }
+
+                        modalGroups.forEach(function (group, gIdx) {
+                            const card = document.createElement('div');
+                            card.className = 'editor-group-card' + (group.showLine ? ' has-line' : '');
+                            card.dataset.groupIndex = String(gIdx);
+
+                            const header = document.createElement('div');
+                            header.className = 'editor-group-header';
+
+                            const dragHandle = document.createElement('div');
+                            dragHandle.className = 'group-drag-handle';
+                            dragHandle.setAttribute('aria-label', 'ドラッグしてグループを並び替え');
+                            dragHandle.title = 'ドラッグしてグループを並び替え';
+                            dragHandle.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 8h16M4 12h16M4 16h16"/></svg>';
+
+                            const titleInput = document.createElement('input');
+                            titleInput.type = 'text';
+                            titleInput.className = 'group-title-input';
+                            titleInput.placeholder = 'グループ名（空欄なら見出しなし）';
+                            titleInput.value = group.title || '';
+                            titleInput.addEventListener('input', function (e) {
+                                modalGroups[gIdx].title = e.target.value;
+                            });
+
+                            const actions = document.createElement('div');
+                            actions.className = 'group-header-actions';
+
+                            const lineBtn = document.createElement('button');
+                            lineBtn.type = 'button';
+                            lineBtn.className = 'btn-line-toggle' + (group.showLine ? ' active' : '');
+                            lineBtn.textContent = group.showLine ? '┃ 縦ラインON' : '縦ラインOFF';
+                            lineBtn.title = '詳細画面で左側に縦ラインを付けてまとめる';
+                            lineBtn.addEventListener('click', function () {
+                                modalGroups[gIdx].showLine = !modalGroups[gIdx].showLine;
+                                renderEditorGroupsArea();
+                            });
+
+                            const delGroupBtn = document.createElement('button');
+                            delGroupBtn.type = 'button';
+                            delGroupBtn.className = 'btn-group-delete';
+                            delGroupBtn.title = 'このグループを削除';
+                            delGroupBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg><span>削除</span>';
+                            delGroupBtn.addEventListener('click', function () {
+                                const currentGroup = modalGroups[gIdx];
+                                if (hasFilledItemsInGroup(currentGroup)) {
+                                    const gLabel = (currentGroup.title || '').trim() || 'このグループ';
+                                    openConfirmDialog(
+                                        'グループを削除しますか？',
+                                        '「' + gLabel + '」に含まれる材料もまとめて削除されます。',
+                                        'グループを削除',
+                                        function () {
+                                            deleteGroupAtIndex(gIdx);
+                                        }
+                                    );
+                                } else {
+                                    deleteGroupAtIndex(gIdx);
+                                }
+                            });
+
+                            actions.appendChild(lineBtn);
+                            actions.appendChild(delGroupBtn);
+
+                            header.appendChild(dragHandle);
+                            header.appendChild(titleInput);
+                            header.appendChild(actions);
+                            card.appendChild(header);
+
+                            header.addEventListener('contextmenu', function (e) {
+                                if (!e.target.closest('input')) e.preventDefault();
+                            });
+                            header.addEventListener('pointerdown', function (e) {
+                                handleGroupPointerDown(e, card);
+                            });
+
+                            if (!Array.isArray(group.items) || group.items.length === 0) {
+                                group.items = [{ name: '', amount1: '', customAmounts: {} }];
+                            }
+
+                            group.items.forEach(function (item, iIdx) {
+                                const row = document.createElement('div');
+                                row.className = 'ing-base-row';
+
+                                const nameInput = document.createElement('input');
+                                nameInput.type = 'text';
+                                nameInput.className = 'text-input';
+                                nameInput.placeholder = '材料名（例：玉ねぎ）';
+                                nameInput.value = item.name || '';
+                                nameInput.addEventListener('input', function (e) {
+                                    modalGroups[gIdx].items[iIdx].name = e.target.value;
+                                });
+
+                                const amountInput = document.createElement('input');
+                                amountInput.type = 'text';
+                                amountInput.className = 'text-input';
+                                amountInput.placeholder = '分量（1/2個）';
+                                amountInput.value = item.amount1 || '';
+                                amountInput.addEventListener('input', function (e) {
+                                    modalGroups[gIdx].items[iIdx].amount1 = e.target.value;
+                                });
+
+                                const rmBtn = document.createElement('button');
+                                rmBtn.type = 'button';
+                                rmBtn.className = 'btn-remove-row';
+                                rmBtn.setAttribute('aria-label', '材料を削除');
+                                rmBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 18L18 6M6 6l12 12"/></svg>';
+                                rmBtn.addEventListener('click', function () {
+                                    if (modalGroups[gIdx].items.length > 1) {
+                                        modalGroups[gIdx].items.splice(iIdx, 1);
+                                    } else {
+                                        modalGroups[gIdx].items[0] = { name: '', amount1: '', customAmounts: {} };
+                                    }
+                                    renderEditorServingTabs();
+                                    renderEditorGroupsArea();
+                                });
+
+                                row.appendChild(nameInput);
+                                row.appendChild(amountInput);
+                                row.appendChild(rmBtn);
+                                card.appendChild(row);
+                            });
+
+                            const addItemBtn = document.createElement('button');
+                            addItemBtn.type = 'button';
+                            addItemBtn.className = 'btn-add-item-in-group';
+                            addItemBtn.textContent = '＋ 材料を追加';
+                            addItemBtn.addEventListener('click', function () {
+                                modalGroups[gIdx].items.push({ name: '', amount1: '', customAmounts: {} });
+                                renderEditorGroupsArea();
+                                const cards = editorGroupsContainer.querySelectorAll('.editor-group-card');
+                                if (cards[gIdx]) {
+                                    const inputs = cards[gIdx].querySelectorAll('.ing-base-row .text-input');
+                                    if (inputs.length >= 2) inputs[inputs.length - 2].focus();
+                                }
+                            });
+                            card.appendChild(addItemBtn);
+
+                            editorGroupsContainer.appendChild(card);
+                        });
+                    } else {
+                        const isSelf = modalServingTab === 'self';
+                        editorHintText.textContent = isSelf
+                            ? '空欄は「1人前」と同じになります。自分用に変えたい材料だけ入力してください。'
+                            : '空欄は自動計算（' + modalServingTab + '倍）が使われます。調整したい材料だけ入力してください。';
+
+                        const hasCustom = hasCustomInGroups(modalGroups, modalServingTab);
+                        resetServingCustomBtn.classList.toggle('hidden', !hasCustom);
+                        resetServingCustomBtn.textContent = isSelf
+                            ? '自分用をクリア'
+                            : modalServingTab + '人前をクリア';
+                        groupPresetBox.classList.add('hidden');
+
+                        let totalValid = 0;
+
+                        modalGroups.forEach(function (group, gIdx) {
+                            const validItems = (group.items || [])
+                                .map(function (item, iIdx) { return { item: item, iIdx: iIdx }; })
+                                .filter(function (entry) {
+                                    return (entry.item.name || '').trim() !== '' || (entry.item.amount1 || '').trim() !== '';
+                                });
+
+                            if (validItems.length === 0) return;
+                            totalValid += validItems.length;
+
+                            const block = document.createElement('div');
+                            block.className = 'custom-group-block';
+
+                            if (group.title && group.title.trim() !== '') {
+                                const heading = document.createElement('div');
+                                heading.className = 'custom-group-heading';
+                                heading.textContent = group.title.trim();
+                                block.appendChild(heading);
+                            }
+
+                            validItems.forEach(function (entry) {
+                                const item = entry.item;
+                                const iIdx = entry.iIdx;
+                                const autoVal = getAutoAmount(item.amount1, modalServingTab);
+
+                                const row = document.createElement('div');
+                                row.className = 'ing-custom-row';
+
+                                const left = document.createElement('div');
+                                const nameEl = document.createElement('span');
+                                nameEl.className = 'ing-custom-name';
+                                nameEl.textContent = (item.name || '').trim() || '（材料名なし）';
+
+                                const subEl = document.createElement('span');
+                                subEl.className = 'ing-custom-sub';
+                                subEl.textContent = isSelf
+                                    ? '1人前: ' + (item.amount1 || '未入力')
+                                    : '1人前: ' + (item.amount1 || '未入力') + ' → 自動: ' + (autoVal || '-');
+
+                                left.appendChild(nameEl);
+                                left.appendChild(subEl);
+
+                                const customInput = document.createElement('input');
+                                customInput.type = 'text';
+                                customInput.className = 'ing-custom-input';
+                                customInput.value = (item.customAmounts && item.customAmounts[modalServingTab]) || '';
+                                customInput.placeholder = isSelf
+                                    ? (item.amount1 ? '1人前: ' + item.amount1 : '1人前と同じ')
+                                    : (autoVal ? '自動: ' + autoVal : '自動計算');
+
+                                customInput.addEventListener('input', function (e) {
+                                    if (!modalGroups[gIdx].items[iIdx].customAmounts) {
+                                        modalGroups[gIdx].items[iIdx].customAmounts = {};
+                                    }
+                                    modalGroups[gIdx].items[iIdx].customAmounts[modalServingTab] = e.target.value;
+                                    renderEditorServingTabs();
+                                    resetServingCustomBtn.classList.toggle('hidden', !hasCustomInGroups(modalGroups, modalServingTab));
+                                });
+
+                                row.appendChild(left);
+                                row.appendChild(customInput);
+                                block.appendChild(row);
+                            });
+
+                            editorGroupsContainer.appendChild(block);
+                        });
+
+                        if (totalValid === 0) {
+                            const emptyP = document.createElement('p');
+                            emptyP.className = 'helper-text';
+                            emptyP.style.padding = '8px 4px';
+                            emptyP.textContent = '先に「1人前(基準)」タブで材料を入力してください。';
+                            editorGroupsContainer.appendChild(emptyP);
+                        }
+                    }
+                }
+
+                function openRecipeModal(recipeToEdit) {
+                    formError.classList.add('hidden');
+                    formError.textContent = '';
+                    modalServingTab = '1';
+
+                    if (recipeToEdit) {
+                        editingRecipeId = recipeToEdit.id;
+                        modalTitle.textContent = 'レシピを編集';
+                        inputTitle.value = recipeToEdit.title;
+                        modalCategory = sanitizeCategory(recipeToEdit.category);
+                        modalGroups = (recipeToEdit.groups || []).map(function (g) {
+                            return {
+                                title: g.title || '',
+                                showLine: Boolean(g.showLine),
+                                items: (g.items || []).map(function (it) {
+                                    return {
+                                        name: it.name || '',
+                                        amount1: it.amount1 || '',
+                                        customAmounts: Object.assign({}, it.customAmounts || {})
+                                    };
+                                })
+                            };
+                        });
+                        inputSteps.value = (recipeToEdit.steps || []).join('\n');
+                        inputMemo.value = recipeToEdit.memo || '';
+                    } else {
+                        editingRecipeId = null;
+                        modalTitle.textContent = '新しいレシピを追加';
+                        inputTitle.value = '';
+                        modalCategory = activeCategoryTab !== 'all' ? activeCategoryTab : 'main';
+                        modalGroups = [
+                            {
+                                title: '食材',
+                                showLine: false,
+                                items: [
+                                    { name: '', amount1: '', customAmounts: {} },
+                                    { name: '', amount1: '', customAmounts: {} }
+                                ]
+                            },
+                            {
+                                title: '調味料',
+                                showLine: true,
+                                items: [
+                                    { name: '', amount1: '', customAmounts: {} }
+                                ]
+                            }
+                        ];
+                        inputSteps.value = '';
+                        inputMemo.value = '';
+                    }
+
+                    updateCategoryPickerUI();
+                    renderEditorServingTabs();
+                    renderEditorGroupsArea();
+
+                    recipeModal.classList.remove('hidden');
+                    updateBodyScrollLock();
+                    recipeModalBody.scrollTop = 0;
+                    setTimeout(function () { inputTitle.focus(); }, 60);
+                }
+
+                function closeRecipeModal() {
+                    recipeModal.classList.add('hidden');
+                    editingRecipeId = null;
+                    updateBodyScrollLock();
+                }
+
+                function handleFormSubmit(e) {
+                    e.preventDefault();
+
+                    const title = inputTitle.value.trim();
+                    if (!title) {
+                        formError.textContent = 'メニュー名を入力してください。';
+                        formError.classList.remove('hidden');
+                        recipeModalBody.scrollTop = 0;
+                        inputTitle.focus();
+                        return;
+                    }
+
+                    const cleanedGroups = modalGroups
+                        .map(function (g) {
+                            const cleanedItems = (g.items || [])
+                                .map(function (it) {
+                                    const name = (it.name || '').trim();
+                                    const amount1 = (it.amount1 || '').trim();
+                                    const customAmounts = {};
+                                    if (it.customAmounts) {
+                                        ['self', '2', '3', '4', '5'].forEach(function (k) {
+                                            const v = (it.customAmounts[k] || '').trim();
+                                            if (v !== '') customAmounts[k] = v;
+                                        });
+                                    }
+                                    return { name: name, amount1: amount1, customAmounts: customAmounts };
+                                })
+                                .filter(function (it) { return it.name !== '' || it.amount1 !== ''; })
+                                .map(function (it) {
+                                    return {
+                                        name: it.name || '（材料名なし）',
+                                        amount1: it.amount1,
+                                        customAmounts: it.customAmounts
+                                    };
+                                });
+
+                            return {
+                                title: (g.title || '').trim(),
+                                showLine: Boolean(g.showLine),
+                                items: cleanedItems
+                            };
+                        })
+                        .filter(function (g) { return g.items.length > 0; });
+
+                    const steps = parseLines(inputSteps.value);
+                    const memo = inputMemo.value.trim();
+
+                    if (editingRecipeId) {
+                        const target = recipes.find(function (r) { return r.id === editingRecipeId; });
+                        if (target) {
+                            target.title = title;
+                            target.category = modalCategory;
+                            target.groups = cleanedGroups;
+                            target.steps = steps;
+                            target.memo = memo;
+                            saveData();
+                            closeRecipeModal();
+                            if (selectedRecipeId === target.id) {
+                                openDetail(target.id);
+                            } else {
+                                renderList();
+                            }
+                            showToast('レシピを更新しました');
+                        }
+                    } else {
+                        normalizeManualOrder();
+                        const newRecipe = normalizeRecipe({
+                            id: 'recipe-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+                            title: title,
+                            category: modalCategory,
+                            groups: cleanedGroups,
+                            steps: steps,
+                            memo: memo,
+                            createdAt: Date.now(),
+                            order: recipes.length
+                        }, recipes.length);
+                        recipes.push(newRecipe);
+                        saveData();
+                        closeRecipeModal();
+                        showListView();
+                        showToast('新しいレシピを追加しました');
+                    }
+                }
+
+                // --------------------------------------------------
+                // イベント登録
+                // --------------------------------------------------
+                headerLogoBtn.addEventListener('click', showListView);
+                openBackupModalBtn.addEventListener('click', openBackupModal);
+                openAddModalBtn.addEventListener('click', function () { openRecipeModal(null); });
+                emptyAddBtn.addEventListener('click', function () { openRecipeModal(null); });
+
+                categoryTabsEl.addEventListener('click', function (e) {
+                    const tabBtn = e.target.closest('.cat-tab');
+                    if (!tabBtn) return;
+                    const nextCat = tabBtn.dataset.category;
+                    if (nextCat === activeCategoryTab) return;
+                    activeCategoryTab = nextCat;
+                    renderList();
+                });
+
+                sortSelect.addEventListener('change', function (e) {
+                    sortBy = e.target.value;
+                    saveSortPreference();
+                    renderList();
+                });
+
+                backToListBtn.addEventListener('click', showListView);
+                editRecipeBtn.addEventListener('click', function () {
+                    const recipe = recipes.find(function (r) { return r.id === selectedRecipeId; });
+                    if (recipe) openRecipeModal(recipe);
+                });
+
+                deleteRecipeBtn.addEventListener('click', function () {
+                    const recipe = recipes.find(function (r) { return r.id === selectedRecipeId; });
+                    if (!recipe) return;
+                    openConfirmDialog(
+                        'レシピを削除しますか？',
+                        '「' + recipe.title + '」を削除します。この操作は取り消せません。',
+                        '削除する',
+                        function () {
+                            recipes = recipes.filter(function (r) { return r.id !== selectedRecipeId; });
+                            normalizeManualOrder();
+                            saveData();
+                            showListView();
+                            showToast('レシピを削除しました');
+                        }
+                    );
+                });
+
+                resetCheckBtn.addEventListener('click', function () {
+                    checkedKeys.clear();
+                    const recipe = recipes.find(function (r) { return r.id === selectedRecipeId; });
+                    if (recipe) renderDetailIngredients(recipe);
+                });
+
+                categoryPicker.addEventListener('click', function (e) {
+                    const btn = e.target.closest('.cat-pick-btn');
+                    if (!btn) return;
+                    modalCategory = btn.dataset.cat;
+                    updateCategoryPickerUI();
+                });
+
+                resetServingCustomBtn.addEventListener('click', function () {
+                    if (modalServingTab === '1') return;
+                    modalGroups.forEach(function (g) {
+                        (g.items || []).forEach(function (item) {
+                            if (item.customAmounts && item.customAmounts[modalServingTab]) {
+                                delete item.customAmounts[modalServingTab];
+                            }
+                        });
+                    });
+                    renderEditorServingTabs();
+                    renderEditorGroupsArea();
+                    showToast('カスタム分量をクリアしました');
+                });
+
+                closeModalBtn.addEventListener('click', closeRecipeModal);
+                cancelModalBtn.addEventListener('click', closeRecipeModal);
+                recipeForm.addEventListener('submit', handleFormSubmit);
+                recipeModal.addEventListener('click', function (e) {
+                    if (e.target === recipeModal) closeRecipeModal();
+                });
+
+                // バックアップモーダル操作
+                closeBackupModalBtn.addEventListener('click', closeBackupModal);
+                doneBackupModalBtn.addEventListener('click', closeBackupModal);
+                backupModal.addEventListener('click', function (e) {
+                    if (e.target === backupModal) closeBackupModal();
+                });
+                exportJsonFileBtn.addEventListener('click', handleExportJsonFile);
+                copyJsonTextBtn.addEventListener('click', handleCopyJsonText);
+                triggerFileImportBtn.addEventListener('click', function () {
+                    importFileInput.value = '';
+                    importFileInput.click();
+                });
+                importFileInput.addEventListener('change', function (e) {
+                    const file = e.target.files && e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = function (ev) {
+                        processImportJsonString(String(ev.target.result || ''));
+                    };
+                    reader.onerror = function () {
+                        backupError.textContent = 'ファイルの読み込みに失敗しました。';
+                        backupError.classList.remove('hidden');
+                    };
+                    reader.readAsText(file, 'utf-8');
+                });
+                importTextBtn.addEventListener('click', function () {
+                    processImportJsonString(importJsonTextarea.value);
+                });
+
+                // 確認モーダル操作
+                confirmModal.addEventListener('click', function (e) {
+                    if (e.target === confirmModal) closeConfirmDialog();
+                });
+                cancelConfirmBtn.addEventListener('click', closeConfirmDialog);
+                okConfirmBtn.addEventListener('click', function () {
+                    const cb = confirmActionCallback;
+                    closeConfirmDialog();
+                    if (typeof cb === 'function') cb();
+                });
+
+                // ESCキーでモーダルを閉じる
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape') {
+                        if (!confirmModal.classList.contains('hidden')) {
+                            closeConfirmDialog();
+                        } else if (!backupModal.classList.contains('hidden')) {
+                            closeBackupModal();
+                        } else if (!recipeModal.classList.contains('hidden')) {
+                            closeRecipeModal();
+                        }
+                    }
+                });
+
+                // 初期化実行
+                renderPresetChips();
+                loadData();
+                renderList();
+            }
+        })();
+    </script>
+</body>
+</html>
